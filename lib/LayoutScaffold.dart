@@ -10,7 +10,7 @@ class LayoutScaffold extends StatelessWidget {
       : super(key: key ?? const ValueKey("LayoutScaffold"));
 
   static const destinations = [
-    Destination(label: 'Match', icon: Icons.sports_tennis),
+    Destination(label: 'Match', icon: Icons.sports_basketball),
     Destination(label: 'Historique', icon: Icons.format_list_bulleted_outlined),
     Destination(label: 'Stats', icon: Icons.stacked_line_chart),
   ];
