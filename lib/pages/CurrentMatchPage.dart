@@ -1,12 +1,16 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:sample_sport_stats/models/Opponent.dart';
+import 'package:sample_sport_stats/models/ActionGame.dart';
+import 'package:sample_sport_stats/widgets/PlayerButton.dart';
+
+import '../models/Game.dart';
+import '../widgets/ActionButton.dart';
 
 class CurrentMatchpage extends StatefulWidget {
-  final Opponent opponent;
+  final Game game;
 
-  const CurrentMatchpage({super.key, required this.opponent});
+  const CurrentMatchpage({super.key, required this.game});
 
   @override
   State<StatefulWidget> createState() {
@@ -15,179 +19,155 @@ class CurrentMatchpage extends StatefulWidget {
 }
 
 class CurrentMatchpageState extends State<CurrentMatchpage> {
-  List<String> players = [
-    "Joueur 1",
-    "Joueur 2",
-    "Joueur 3",
-    "Joueur 4",
-    "Joueur 5"
-  ];
-  List<String> enemies = [
-    "Adversaire 1",
-    "Adversaire 2",
-    "Adversaire 3",
-    "Adversaire 4",
-    "Adversaire 5"
-  ];
-
-  OverlayEntry? overlayEntry;
-
-  @override
-  void initState() {
-    super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);
-  }
-
-  @override
-  void dispose() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    var name = widget.opponent.name;
-    var rank = widget.opponent.rank;
+    var name = widget.game.opponentName;
+    var teamScore = widget.game.teamScore;
+    var opponentScore = widget.game.opponentScore;
+    var teamPlayers = widget.game.teamPlayers;
+    var opponentsPlayers = widget.game.opponentPlayers;
+
+    var actions = ActionGame.values;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Match en cours"),
       ),
       body: Column(children: [
-        Text("Face à :  $name $rank"),
+        Text("Contre $name",
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            )),
+        Text(
+          "$teamScore - $opponentScore",
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [ElevatedButton(
-                  onPressed: () {
-                    showOverlay(context);
-                  },
-                  child: Text(players[0]),
+            Expanded(
+                flex: 35,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: teamPlayers
+                            .map((player) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: PlayerButton(
+                                  color: Colors.blue,
+                                  playerName: player.name,
+                                  playerNumber: player.number,
+                                )))
+                            .toList()),
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: opponentsPlayers
+                            .map((player) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: PlayerButton(
+                                  color: Colors.red,
+                                  playerName: player.name,
+                                  playerNumber: player.number,
+                                )))
+                            .toList()),
+                  ],
+                )),
+            Expanded(
+              flex: 30,
+              child: Container(
+                color: Colors.green, // Couleur de fond pour la visualisation (optionnel)
+                child: Column(
+                  children: [
+                    // Texte en haut
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Historique des actions :",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showOverlay(context);
-                    },
-                    child: Text(players[1]),
-                  )]),
-            Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [ElevatedButton(
-                  onPressed: () {
-                    showOverlay(context);
-                  },
-                  child: Text(players[2]),
-                ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showOverlay(context);
-                    },
-                    child: Text(players[3]),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showOverlay(context);
-                    },
-                    child: Text(players[4]),
-                  )]),
-            Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [ElevatedButton(
-                  onPressed: () {
-                    showOverlay(context);
-                  },
-                  child: Text(enemies[0]),
-                ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showOverlay(context);
-                    },
-                    child: Text(enemies[1]),
-
-                  ),ElevatedButton(
-                    onPressed: () {
-                      showOverlay(context);
-                    },
-                    child: Text(enemies[2]),
-                  )]),
-            Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [ElevatedButton(
-                  onPressed: () {
-                    showOverlay(context);
-                  },
-                  child: Text(enemies[3]),
-                ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showOverlay(context);
-                    },
-                    child: Text(enemies[4]),
-                  ),
-                ]),
-          ],
-        )
-      ]),
+              ),
+            ),
+            Expanded(flex: 35,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: _buildActionRows(actions),))
+      ])])
     );
   }
 
-  void showOverlay(BuildContext context) {
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: MediaQuery.of(context).size.width / 8,
-        child: Material(
-          elevation: 8.0,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.84,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(onPressed: () {}, child: Text("Bouton 1")),
-                    ElevatedButton(onPressed: () {}, child: Text("Bouton 2")),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(onPressed: () {}, child: Text("Bouton 3")),
-                    ElevatedButton(onPressed: () {}, child: Text("Bouton 4")),
-                  ],
-                ),
-                TextButton(
-                  onPressed: () {
-                    overlayEntry?.remove();
+  List<Widget> _buildActionRows(List<ActionGame> actions) {
+    List<Widget> rows = [];
 
-                  },
-                  child: Text("Fermer"),
-                ),
-              ],
-            ),
-          ),
-        ),
+    var firstColumn = actions.sublist(0,  actions.length ~/ 2);
+    var lastColumn = actions.sublist(actions.length ~/ 2,  actions.length);
+    rows.add(
+      Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: firstColumn.map((action) {
+          return Padding(
+              padding:
+              const EdgeInsets.symmetric(vertical: 10),
+              child:Actionbutton(
+                text: action.name,
+                color: Colors.lime,
+                callback: () {
+                  if (action.type == ActionType.point) {
+                    log("PANIER");
+                  }
+                  if (action.type == ActionType.failedShot) {
+                    log("RATE");
+                  }
+                  if (action.type == ActionType.fault) {
+                    log("FAUTE");
+                  }
+                },
+              ));
+        }).toList(),
       ),
     );
 
-    Overlay.of(context).insert(overlayEntry!);
+    rows.add(
+      Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: lastColumn.map((action) {
+          return Padding(
+              padding:
+              const EdgeInsets.symmetric(vertical: 10),
+              child:Actionbutton(
+                text: action.name,
+                color: Colors.lime,
+                callback: () {
+                  if (action.type == ActionType.point) {
+                    log("PANIER");
+                  }
+                  if (action.type == ActionType.failedShot) {
+                    log("RATE");
+                  }
+                  if (action.type == ActionType.fault) {
+                    log("FAUTE");
+                  }
+                },
+              ));
+        }).toList(),
+      ),
+    );
+
+    return rows;
   }
+
 }

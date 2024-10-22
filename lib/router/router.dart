@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sample_sport_stats/LayoutScaffold.dart';
-import 'package:sample_sport_stats/models/Opponent.dart';
+import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/pages/CurrentMatchPage.dart';
 import 'package:sample_sport_stats/pages/HistoryPage.dart';
 import 'package:sample_sport_stats/pages/MatchPage.dart';
@@ -24,7 +24,7 @@ final router = GoRouter(
               path: Routes.matchPage, builder: (context, state) => MatchPage(),
             routes: [
               GoRoute(path: Routes.currentMatchPage, builder: (context, state) => CurrentMatchpage(
-                opponent: state.extra as Opponent,
+                game: state.extra as Game,
               ))
             ])
         ]),
