@@ -4,11 +4,12 @@ class PlayerButton extends StatelessWidget {
   final String playerName;
   final int playerNumber;
   final Color color;
+  final Function callback;
 
   const PlayerButton({
     Key? key,
     required this.playerName,
-    required this.playerNumber, this.color = Colors.blue,
+    required this.playerNumber, this.color = Colors.blue, required this.callback,
   }) : super(key: key);
 
   @override
@@ -23,8 +24,7 @@ class PlayerButton extends StatelessWidget {
         ),
       ),
       onPressed: () {
-
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Joueur : $playerName, Numéro : $playerNumber')));
+        callback();
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,

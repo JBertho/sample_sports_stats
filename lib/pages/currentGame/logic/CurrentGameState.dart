@@ -1,0 +1,26 @@
+import 'package:sample_sport_stats/models/ActionGame.dart';
+import 'package:sample_sport_stats/models/History.dart';
+import 'package:sample_sport_stats/models/Player.dart';
+
+abstract class CurrentGameState {
+  int teamScore;
+  int opponentScore;
+  //final List<Player> teamPlayers;
+  //final List<Player> opponentPlayers;
+  final List<History> histories;
+
+  CurrentGameState({required this.teamScore,required this.opponentScore, required this.histories});
+}
+
+
+class CurrentGameInitial extends CurrentGameState {
+  CurrentGameInitial({required super.histories, required super.teamScore, required super.opponentScore});
+}
+
+class CurrentGameInProgress extends CurrentGameState {
+  final Player? selectedPlayer;
+  final ActionGame? selectedAction;
+
+  CurrentGameInProgress({this.selectedPlayer, this.selectedAction, required super.teamScore, required super.opponentScore, required super.histories});
+
+}
