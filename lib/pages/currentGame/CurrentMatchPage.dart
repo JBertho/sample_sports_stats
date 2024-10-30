@@ -56,7 +56,7 @@ class _CurrentMatchPage extends StatelessWidget {
                         ),
                       ),
                       if(state is CurrentGameInProgress)
-                        CurrentGame(state: state, teamPlayers: teamPlayers, opponentPlayers: opponentsPlayers,)
+                        Expanded(child: CurrentGame(state: state, teamPlayers: teamPlayers, opponentPlayers: opponentsPlayers,))
                     ]))));
   }
 }
@@ -115,21 +115,28 @@ class CurrentGame extends StatelessWidget {
             ],
           )),
       Expanded(
-        flex: 30,
+        flex: 30, // 30% de l'écran
         child: Container(
-          color: Colors.green,
-          // Couleur de fond pour la visualisation (optionnel)
+          color: Colors.white,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Texte en haut
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Historique des actions :",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+              Text(
+                'Historique',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: state.histories.length, // Nombre d'événements
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text('${state.histories[index].player.name } => ${state.histories[index].actionGame.name}'),
+                    );
+                  },
                 ),
               ),
             ],
@@ -205,4 +212,72 @@ class CurrentGame extends StatelessWidget {
   }
 
 
+}
+
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('3 Colonnes Layout'),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  // Colonne de gauche
+                  Expanded(
+                    flex: 35, // 35% de l'écran
+                    child: Container(
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                  // Colonne du milieu
+                  Expanded(
+                    flex: 30, // 30% de l'écran
+                    child: Container(
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Historique',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: 10, // Nombre d'événements
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  title: Text('Événement ${index + 1}'),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Colonne de droite
+                  Expanded(
+                    flex: 35, // 35% de l'écran
+                    child: Container(
+                      color: Colors.greenAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
