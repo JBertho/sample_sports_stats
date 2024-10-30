@@ -33,6 +33,7 @@ dependencies:
   go_router: ^14.2.6
   bloc: ^8.1.4
   flutter_bloc: ^8.1.6
+  google_fonts: ^6.2.1
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/models/Player.dart';
 
+import '../AppColors.dart';
 import '../router/routes.dart';
 
 class MatchPage extends StatelessWidget {
@@ -24,19 +26,123 @@ class MatchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("MATCH"),),
-        body: Center(
-        child: Column(
+        body: SafeArea(child: Container(
+            color: AppColors.grey,
+            child:Center(
+        child: Padding(padding: EdgeInsets.only(top: 40), child:
+        Column(
           mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Commencer un match "),
-        ElevatedButton(
-            onPressed: () {
-              context.push(Routes.nestedCurrentMatchPage,
-              extra: game);
-            },
-            child: const Text("Start game"))
+        Text("Nouveau match ", style: GoogleFonts.anton(textStyle: const TextStyle(fontSize: 40, color: AppColors.blue))),
+        Expanded(child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              flex: 33,
+              child: Padding(padding: EdgeInsets.all(25),child:  Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+
+                ),
+              )),
+              
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(padding: EdgeInsets.only(top: 30), child:RectangleRoundedButton(onPressed: (){}, text: "Paramètres du match", visible: false,)),
+                Padding(padding: EdgeInsets.only(top: 20), child:RectangleRoundedButton(onPressed: (){}, text: "Statistiques avancées", visible: false,)),
+                Spacer(),
+                CircularButton(onPressed: () {
+                  context.push(Routes.nestedCurrentMatchPage,
+                      extra: game);
+                }),
+                Spacer(),
+                Padding(padding: EdgeInsets.only(bottom: 20), child: RectangleRoundedButton(onPressed: (){}, text: "Paramètres du match")),
+                Padding(padding: EdgeInsets.only(bottom: 30), child: RectangleRoundedButton(onPressed: (){}, text: "Statistiques avancées")),
+              ],
+            ),
+            Expanded(
+              flex: 33,
+              child: Padding(padding: EdgeInsets.all(25),child:  Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+
+                ),
+              )),
+
+            ),
+          ],
+        ))
       ],
-    )));
+    ))))));
+  }
+}
+
+
+class CircularButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  CircularButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return  Material(
+        color: AppColors.orange,
+        borderRadius: BorderRadius.circular(57.5),
+        child:InkWell(
+      borderRadius: BorderRadius.circular(57.5),
+      splashColor: Colors.deepOrange,
+      onTap: onPressed, // Utilise la fonction passée en paramètre
+      child: Container(
+        width: 115,
+        height: 115,
+        child: Center(
+          child: Text(
+            'GO !',
+            style: GoogleFonts.anton(textStyle: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ),
+      ),
+    ));
+  }
+}
+
+class RectangleRoundedButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String text;
+  final bool visible;
+
+  RectangleRoundedButton({required this.onPressed, required this.text, this.visible = true});
+
+  @override
+  Widget build(BuildContext context) {
+    if( !visible ) {
+      return Container(
+          width: 160,
+          height: 45,
+        color: Colors.transparent,
+      );
+    }
+    return  Material(
+        color: AppColors.orange,
+        borderRadius: BorderRadius.circular(10),
+        child:InkWell(
+          borderRadius: BorderRadius.circular(10),
+          splashColor: Colors.deepOrange,
+          onTap: onPressed, // Utilise la fonction passée en paramètre
+          child: Container(
+            width: 160,
+            height: 45,
+            child: Center(
+              child: Text(
+                text,
+                style: GoogleFonts.anton(textStyle: const TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ),
+        ));
   }
 }
