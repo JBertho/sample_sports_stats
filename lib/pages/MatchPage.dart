@@ -39,15 +39,15 @@ class MatchPage extends StatelessWidget {
           children: [
             Expanded(
               flex: 33,
-              child: Padding(padding: EdgeInsets.all(25),child:  Container(
+              child: Padding(padding: const EdgeInsets.all(25),child:  Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: Colors.white,
                 ),
-                child: Padding(padding: EdgeInsets.all(10),
+                child: Padding(padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
-                Container(
+                    Container(
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                 height: 40,
@@ -57,6 +57,44 @@ class MatchPage extends StatelessWidget {
                 ),
                   child: const Text("Nom de l'équipe adverse"),
                 ),
+                    Row(
+                      children: [
+                        Expanded(flex: 5,  child: Padding(padding: EdgeInsets.only(top: 10,right: 10),child:Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: AppColors.blue
+                          ),
+                          child: Center(child:Text("Domicile", style: TextStyle(color: Colors.white)),),
+                          height: 60))),
+                        Expanded(flex: 5,  child: Padding(padding: const EdgeInsets.only(top: 10,left: 10),child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.grey
+                            ),
+                            child: Center(child:Text("Exterieur", style: TextStyle(color: AppColors.blue)),),
+                            height: 60))),
+                      ],
+                    ),
+                    Expanded(child: ListView.builder(
+                      itemCount: 10,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(padding: EdgeInsets.symmetric(vertical: 5), child: Row(
+                          children: [
+                            Expanded(flex: 5, child: Center(child:Text("Joueur adverse ${index + 1} ", style: TextStyle( fontSize: 15),))),
+                            Expanded(flex: 5, child: Center(child:Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all()
+                              ),
+                              height: 30,
+                              width: 40,
+                            ))),
+                          ],
+                        ));
+                      },
+
+                    ))
+
                   ],
                 ),),
               )),
