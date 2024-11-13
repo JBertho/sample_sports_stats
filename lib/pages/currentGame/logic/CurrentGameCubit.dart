@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/History.dart';
-import 'package:sample_sport_stats/models/Player.dart';
+import 'package:sample_sport_stats/models/MatchPlayer.dart';
 
 import 'CurrentGameState.dart';
 
@@ -15,7 +15,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         teamScore: 0, opponentScore: 0, histories: List.empty()));
   }
 
-  void selectPlayer(Player player) {
+  void selectPlayer(MatchPlayer player) {
     var currentState = state as CurrentGameInProgress;
 
     if (currentState.selectedAction == null) {
@@ -43,7 +43,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     }
   }
 
-  void saveAction(Player player, ActionGame actionGame) {
+  void saveAction(MatchPlayer player, ActionGame actionGame) {
     var currentState = state as CurrentGameInProgress;
 
     var histories = currentState.histories;

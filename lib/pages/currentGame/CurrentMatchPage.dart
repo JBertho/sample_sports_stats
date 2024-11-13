@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
-import 'package:sample_sport_stats/models/Player.dart';
+import 'package:sample_sport_stats/models/MatchPlayer.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameCubit.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameState.dart';
 import 'package:sample_sport_stats/widgets/PlayerButton.dart';
@@ -63,8 +63,8 @@ class _CurrentMatchPage extends StatelessWidget {
 
 class CurrentGame extends StatelessWidget {
   final CurrentGameInProgress state;
-  final List<Player> teamPlayers;
-  final List<Player> opponentPlayers;
+  final List<MatchPlayer> teamPlayers;
+  final List<MatchPlayer> opponentPlayers;
   const CurrentGame({super.key, required this.state, required this.teamPlayers, required this.opponentPlayers});
 
   @override

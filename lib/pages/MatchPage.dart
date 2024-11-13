@@ -2,126 +2,194 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sample_sport_stats/models/Game.dart';
+import 'package:sample_sport_stats/models/MatchPlayer.dart';
 import 'package:sample_sport_stats/models/Player.dart';
 
 import '../AppColors.dart';
 import '../router/routes.dart';
 
 class MatchPage extends StatelessWidget {
-
-  final Game game = Game(opponentName: "Charly Bertho", teamPlayers: [
+  final List<Player> teamPlayers = [
     Player(name: "Jamso", number: 1),
     Player(name: "Carlito", number: 14),
     Player(name: "Jean", number: 5),
     Player(name: "Paul", number: 231),
     Player(name: "Claude", number: 4),
+    Player(name: "Jimmy", number: 2),
+    Player(name: "Ali", number: 8),
+    Player(name: "Max", number: 12),
+    Player(name: "Guillaume", number: 23),
+    Player(name: "Charles", number: 18),
+  ];
+
+  final Game game = Game(opponentName: "Charly Bertho", teamPlayers: [
+    MatchPlayer(name: "Jamso", number: 1),
+    MatchPlayer(name: "Carlito", number: 14),
+    MatchPlayer(name: "Jean", number: 5),
+    MatchPlayer(name: "Paul", number: 231),
+    MatchPlayer(name: "Claude", number: 4),
   ], opponentPlayers: [
-    Player(name: "Leona", number: 8),
-    Player(name: "Ezreal", number: 16),
-    Player(name: "K'Santé", number: 48),
-    Player(name: "Lux", number: 32),
-    Player(name: "Kindred", number: 2),
+    MatchPlayer(name: "Leona", number: 8),
+    MatchPlayer(name: "Ezreal", number: 16),
+    MatchPlayer(name: "K'Santé", number: 48),
+    MatchPlayer(name: "Lux", number: 32),
+    MatchPlayer(name: "Kindred", number: 2),
   ]);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(child: Container(
-            color: AppColors.grey,
-            child:Center(
-        child: Padding(padding: EdgeInsets.only(top: 20), child:
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text("Nouveau match ", style: GoogleFonts.anton(textStyle: const TextStyle(fontSize: 40, color: AppColors.blue))),
-        Expanded(child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Expanded(
-              flex: 33,
-              child: Padding(padding: EdgeInsets.all(25),child:  LeftSideWidget()),
-
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(padding: EdgeInsets.only(top: 30), child:RectangleRoundedButton(onPressed: (){}, text: "Paramètres du match", visible: false,)),
-                Padding(padding: EdgeInsets.only(top: 20), child:RectangleRoundedButton(onPressed: (){}, text: "Statistiques avancées", visible: false,)),
-                Spacer(),
-                CircularButton(onPressed: () {
-                  context.push(Routes.nestedCurrentMatchPage,
-                      extra: game);
-                }),
-                Spacer(),
-                Padding(padding: EdgeInsets.only(bottom: 20), child: RectangleRoundedButton(onPressed: (){}, text: "Paramètres du match")),
-                Padding(padding: EdgeInsets.only(bottom: 30), child: RectangleRoundedButton(onPressed: (){}, text: "Statistiques avancées")),
-              ],
-            ),
-            const Expanded(
-              flex: 33,
-              child: Padding(padding: EdgeInsets.all(25),child:  RightSideWidget()),
-
-            ),
-          ],
-        ))
-      ],
-    ))))));
+        body: SafeArea(
+            child: Container(
+                color: AppColors.grey,
+                child: Center(
+                    child: Stack(children: [
+                  Padding(
+                      padding: EdgeInsets.only(top: 75, left: 22),
+                      child: Image(
+                        image: AssetImage('assets/court_bg.png'),
+                      )),
+                  Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Nouveau match ",
+                              style: GoogleFonts.anton(
+                                  textStyle: const TextStyle(
+                                      fontSize: 40, color: AppColors.blue))),
+                          Expanded(
+                              child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Expanded(
+                                flex: 33,
+                                child: Padding(
+                                    padding: EdgeInsets.all(25),
+                                    child: LeftSideWidget()),
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                      padding: EdgeInsets.only(top: 30),
+                                      child: RectangleRoundedButton(
+                                        onPressed: () {},
+                                        text: "Paramètres du match",
+                                        visible: false,
+                                      )),
+                                  Padding(
+                                      padding: EdgeInsets.only(top: 20),
+                                      child: RectangleRoundedButton(
+                                        onPressed: () {},
+                                        text: "Statistiques avancées",
+                                        visible: false,
+                                      )),
+                                  Spacer(),
+                                  CircularButton(onPressed: () {
+                                    context.push(Routes.nestedCurrentMatchPage,
+                                        extra: game);
+                                  }),
+                                  Spacer(),
+                                  Padding(
+                                      padding: EdgeInsets.only(bottom: 20),
+                                      child: RectangleRoundedButton(
+                                          onPressed: () {},
+                                          text: "Paramètres du match")),
+                                  Padding(
+                                      padding: EdgeInsets.only(bottom: 30),
+                                      child: RectangleRoundedButton(
+                                          onPressed: () {},
+                                          text: "Statistiques avancées")),
+                                ],
+                              ),
+                              Expanded(
+                                flex: 33,
+                                child: Padding(
+                                    padding: EdgeInsets.all(25),
+                                    child: RightSideWidget(
+                                      teamPlayers: teamPlayers,
+                                    )),
+                              ),
+                            ],
+                          ))
+                        ],
+                      ))
+                ])))));
   }
 }
 
 class RightSideWidget extends StatelessWidget {
+  final List<Player> teamPlayers;
+
   const RightSideWidget({
-    super.key,
+    super.key, required this.teamPlayers,
   });
 
   @override
   Widget build(BuildContext context) {
+
+    int middleIndex = (teamPlayers.length / 2).round();
+
+    List<Player> group1 = teamPlayers.sublist(0, middleIndex);
+    List<Player> group2 = teamPlayers.sublist(middleIndex);
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Colors.white,
-
       ),
-      child: const Padding(padding: const EdgeInsets.only(top: 20,bottom: 5,left: 30, right: 30),
-        child:  Column(
-          children: [
-            Text("Choix de mes joueurs : "),
-             Row(
-              children: [
-                Expanded(child: Column(
-                  children: [
-                    PlayerSelectionWidget(isSelected: false,playerName: "Jameso", playerNumber: 14),
-                    PlayerSelectionWidget(isSelected: true,playerName: "Charly", playerNumber: 2),
-                    PlayerSelectionWidget(isSelected: false,playerName: "Jean", playerNumber: 11),
-                    PlayerSelectionWidget(isSelected: true,playerName: "Maxime", playerNumber: 39),
-                    PlayerSelectionWidget(isSelected: false,playerName: "Jimmy", playerNumber: 57)
-                  ],
-                )),
-                Expanded(child: Column(
-                  children: [
-                    PlayerSelectionWidget(isSelected: true,playerName: "Ali", playerNumber: 15),
-                    PlayerSelectionWidget(isSelected: false,playerName: "Anthony", playerNumber: 1),
-                    PlayerSelectionWidget(isSelected: true,playerName: "Lucas", playerNumber: 6),
-                    PlayerSelectionWidget(isSelected: false,playerName: "Luca", playerNumber: 69),
-                    PlayerSelectionWidget(isSelected: true,playerName: "Elias", playerNumber: 17)
-                  ],
-                )),
-              ],
-            )
-          ],
-        )),
+      child: Padding(
+          padding:
+              const EdgeInsets.only(top: 20, bottom: 5, left: 30, right: 30),
+          child: Column(
+            children: [
+              const Text("Choix de mes joueurs : "),
+              Row(
+                children: [
+                  Expanded(
+                      child: Column(
+                        children: group1.map((player) {
+                          return PlayerSelectionWidget(
+                            isSelected: player.selected,
+                            playerName: player.name,
+                            playerNumber: player.number,
+                            onPressed: ()  {
+                              print(player.name);
+                              player.selected = !player.selected;
+                        });}).toList()
+                  )),
+                  Expanded(
+                      child: Column(
+                          children: group2.map((player) {
+                            return PlayerSelectionWidget(
+                                isSelected: player.selected,
+                                playerName: player.name,
+                                playerNumber: player.number,
+                                onPressed: ()  {
+                                  print(player.name);
+                                  player.selected = !player.selected;
+                                });}).toList()
+                      )),
+                ],
+              )
+            ],
+          )),
     );
   }
 }
 
 class PlayerSelectionWidget extends StatelessWidget {
-
   final bool isSelected;
   final String playerName;
   final int playerNumber;
+  final VoidCallback onPressed;
 
   const PlayerSelectionWidget({
-    super.key, required this.isSelected, required this.playerName, required this.playerNumber,
+    super.key,
+    required this.isSelected,
+    required this.playerName,
+    required this.playerNumber,
+    required this.onPressed,
   });
 
   @override
@@ -129,27 +197,45 @@ class PlayerSelectionWidget extends StatelessWidget {
     Color btnColor = isSelected ? AppColors.blue : AppColors.grey;
     Color txtColor = isSelected ? Colors.white : AppColors.blue;
 
-    return Padding(padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),child: Container(
-      width: double.infinity,
-      decoration:BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: btnColor
-      ),
-      child: Column(
-        children: [
-          Padding(padding: const EdgeInsets.only(top: 10, bottom: 5), child: Text(playerName, style: TextStyle(fontSize: 16, color: txtColor),)),
-          Padding(padding: const EdgeInsets.only(top: 5, bottom: 10),
-              child: Container(
-                width: 40,
-                  height: 40,
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+        child: Material(
+            color: btnColor,
+            borderRadius: BorderRadius.circular(10),
+            child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                splashColor: Colors.green,
+                onTap: onPressed, // Utilise la fonction passée en paramètre
+                child: Container(
+                  width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Center(child:Text("#$playerNumber", style: const TextStyle(color: AppColors.blue, fontSize: 18),)))),
-        ],
-      ),
-    ));
+                  child: Column(
+                    children: [
+                      Padding(
+                          padding: const EdgeInsets.only(top: 10, bottom: 5),
+                          child: Text(
+                            playerName,
+                            style: TextStyle(fontSize: 16, color: txtColor),
+                          )),
+                      Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 10),
+                          child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.white),
+                              child: Center(
+                                  child: Text(
+                                "#$playerNumber",
+                                style: const TextStyle(
+                                    color: AppColors.blue, fontSize: 18),
+                              )))),
+                    ],
+                  ),
+                ))));
   }
 }
 
@@ -165,63 +251,85 @@ class LeftSideWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         color: Colors.white,
       ),
-      child: Padding(padding: const EdgeInsets.only(top: 20,bottom: 5,left: 30, right: 30),
-      child: Column(
-        children: [
-          Container(
-        alignment: Alignment.centerLeft,
-        width: double.infinity,
-      height: 40,
-      decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(10),
-        color: AppColors.grey,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20, bottom: 5, left: 30, right: 30),
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.centerLeft,
+              width: double.infinity,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: AppColors.grey,
+              ),
+              child: const Text("Nom de l'équipe adverse"),
+            ),
+            Row(
+              children: [
+                Expanded(
+                    flex: 5,
+                    child: Padding(
+                        padding: EdgeInsets.only(top: 10, right: 10),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.blue),
+                            child: Center(
+                              child: Text("Domicile",
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                            height: 60))),
+                Expanded(
+                    flex: 5,
+                    child: Padding(
+                        padding: const EdgeInsets.only(top: 10, left: 10),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.grey),
+                            child: Center(
+                              child: Text("Exterieur",
+                                  style: TextStyle(color: AppColors.blue)),
+                            ),
+                            height: 60))),
+              ],
+            ),
+            Expanded(
+                child: ListView.builder(
+              itemCount: 10,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            flex: 5,
+                            child: Center(
+                                child: Text(
+                              "Joueur adverse ${index + 1} ",
+                              style: TextStyle(fontSize: 15),
+                            ))),
+                        Expanded(
+                            flex: 5,
+                            child: Center(
+                                child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all()),
+                              height: 30,
+                              width: 40,
+                            ))),
+                      ],
+                    ));
+              },
+            ))
+          ],
+        ),
       ),
-        child: const Text("Nom de l'équipe adverse"),
-      ),
-          Row(
-            children: [
-              Expanded(flex: 5,  child: Padding(padding: EdgeInsets.only(top: 10,right: 10),child:Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: AppColors.blue
-                ),
-                child: Center(child:Text("Domicile", style: TextStyle(color: Colors.white)),),
-                height: 60))),
-              Expanded(flex: 5,  child: Padding(padding: const EdgeInsets.only(top: 10,left: 10),child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.grey
-                  ),
-                  child: Center(child:Text("Exterieur", style: TextStyle(color: AppColors.blue)),),
-                  height: 60))),
-            ],
-          ),
-          Expanded(child: ListView.builder(
-            itemCount: 10,
-            itemBuilder: (BuildContext context, int index) {
-              return Padding(padding: EdgeInsets.symmetric(vertical: 5), child: Row(
-                children: [
-                  Expanded(flex: 5, child: Center(child:Text("Joueur adverse ${index + 1} ", style: TextStyle( fontSize: 15),))),
-                  Expanded(flex: 5, child: Center(child:Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all()
-                    ),
-                    height: 30,
-                    width: 40,
-                  ))),
-                ],
-              ));
-            },
-
-          ))
-
-        ],
-      ),),
     );
   }
 }
-
 
 class CircularButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -230,24 +338,28 @@ class CircularButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Material(
+    return Material(
         color: AppColors.orange,
         borderRadius: BorderRadius.circular(57.5),
-        child:InkWell(
-      borderRadius: BorderRadius.circular(57.5),
-      splashColor: Colors.deepOrange,
-      onTap: onPressed, // Utilise la fonction passée en paramètre
-      child: Container(
-        width: 115,
-        height: 115,
-        child: Center(
-          child: Text(
-            'GO !',
-            style: GoogleFonts.anton(textStyle: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold)),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(57.5),
+          splashColor: Colors.deepOrange,
+          onTap: onPressed, // Utilise la fonction passée en paramètre
+          child: Container(
+            width: 115,
+            height: 115,
+            child: Center(
+              child: Text(
+                'GO !',
+                style: GoogleFonts.anton(
+                    textStyle: const TextStyle(
+                        fontSize: 40,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold)),
+              ),
+            ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 }
 
@@ -256,21 +368,22 @@ class RectangleRoundedButton extends StatelessWidget {
   final String text;
   final bool visible;
 
-  RectangleRoundedButton({required this.onPressed, required this.text, this.visible = true});
+  RectangleRoundedButton(
+      {required this.onPressed, required this.text, this.visible = true});
 
   @override
   Widget build(BuildContext context) {
-    if( !visible ) {
+    if (!visible) {
       return Container(
-          width: 160,
-          height: 45,
+        width: 160,
+        height: 45,
         color: Colors.transparent,
       );
     }
-    return  Material(
+    return Material(
         color: AppColors.orange,
         borderRadius: BorderRadius.circular(10),
-        child:InkWell(
+        child: InkWell(
           borderRadius: BorderRadius.circular(10),
           splashColor: Colors.deepOrange,
           onTap: onPressed, // Utilise la fonction passée en paramètre
@@ -280,7 +393,11 @@ class RectangleRoundedButton extends StatelessWidget {
             child: Center(
               child: Text(
                 text,
-                style: GoogleFonts.anton(textStyle: const TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.bold)),
+                style: GoogleFonts.anton(
+                    textStyle: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold)),
               ),
             ),
           ),
