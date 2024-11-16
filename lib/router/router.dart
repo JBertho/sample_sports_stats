@@ -4,7 +4,7 @@ import 'package:sample_sport_stats/LayoutScaffold.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/pages/currentGame/CurrentMatchPage.dart';
 import 'package:sample_sport_stats/pages/HistoryPage.dart';
-import 'package:sample_sport_stats/pages/MatchPage.dart';
+import 'package:sample_sport_stats/pages/matchMenu/MatchPage.dart';
 import 'package:sample_sport_stats/pages/StatsPage.dart';
 import 'package:sample_sport_stats/router/routes.dart';
 

@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
 import 'package:sample_sport_stats/models/Player.dart';
+import 'package:sample_sport_stats/pages/matchMenu/logic/MatchCubit.dart';
+import 'package:sample_sport_stats/pages/matchMenu/logic/MatchState.dart';
 
-import '../AppColors.dart';
-import '../router/routes.dart';
+import '../../AppColors.dart';
+import '../../router/routes.dart';
 
 class MatchPage extends StatelessWidget {
-  final List<Player> teamPlayers = [
-    Player(name: "Jamso", number: 1),
-    Player(name: "Carlito", number: 14),
-    Player(name: "Jean", number: 5),
-    Player(name: "Paul", number: 231),
-    Player(name: "Claude", number: 4),
-    Player(name: "Jimmy", number: 2),
-    Player(name: "Ali", number: 8),
-    Player(name: "Max", number: 12),
-    Player(name: "Guillaume", number: 23),
-    Player(name: "Charles", number: 18),
-  ];
+  const MatchPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<MatchCubit>(
+      create: (_) => MatchCubit()..initGame(),
+      child: _MatchPage(),
+    );
+  }
+}
+
+class _MatchPage extends StatelessWidget {
 
   final Game game = Game(opponentName: "Charly Bertho", teamPlayers: [
     MatchPlayer(name: "Jamso", number: 1),
@@ -38,84 +41,89 @@ class MatchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-            child: Container(
-                color: AppColors.grey,
-                child: Center(
-                    child: Stack(children: [
-                  Padding(
-                      padding: EdgeInsets.only(top: 75, left: 22),
-                      child: Image(
-                        image: AssetImage('assets/court_bg.png'),
-                      )),
-                  Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+    return Scaffold(body: SafeArea(child:
+        BlocBuilder<MatchCubit, MatchState>(
+            builder: (context, state) {
+      if (state is MatchStateInProgress) {
+        return Container(
+            color: AppColors.grey,
+            child: Center(
+                child: Stack(children: [
+              Padding(
+                  padding: EdgeInsets.only(top: 75, left: 22),
+                  child: Image(
+                    image: AssetImage('assets/court_bg.png'),
+                  )),
+              Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Nouveau match ",
+                          style: GoogleFonts.anton(
+                              textStyle: const TextStyle(
+                                  fontSize: 40, color: AppColors.blue))),
+                      Expanded(
+                          child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Nouveau match ",
-                              style: GoogleFonts.anton(
-                                  textStyle: const TextStyle(
-                                      fontSize: 40, color: AppColors.blue))),
-                          Expanded(
-                              child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          const Expanded(
+                            flex: 33,
+                            child: Padding(
+                                padding: EdgeInsets.all(25),
+                                child: LeftSideWidget()),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Expanded(
-                                flex: 33,
-                                child: Padding(
-                                    padding: EdgeInsets.all(25),
-                                    child: LeftSideWidget()),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                      padding: EdgeInsets.only(top: 30),
-                                      child: RectangleRoundedButton(
-                                        onPressed: () {},
-                                        text: "Paramètres du match",
-                                        visible: false,
-                                      )),
-                                  Padding(
-                                      padding: EdgeInsets.only(top: 20),
-                                      child: RectangleRoundedButton(
-                                        onPressed: () {},
-                                        text: "Statistiques avancées",
-                                        visible: false,
-                                      )),
-                                  Spacer(),
-                                  CircularButton(onPressed: () {
-                                    context.push(Routes.nestedCurrentMatchPage,
-                                        extra: game);
-                                  }),
-                                  Spacer(),
-                                  Padding(
-                                      padding: EdgeInsets.only(bottom: 20),
-                                      child: RectangleRoundedButton(
-                                          onPressed: () {},
-                                          text: "Paramètres du match")),
-                                  Padding(
-                                      padding: EdgeInsets.only(bottom: 30),
-                                      child: RectangleRoundedButton(
-                                          onPressed: () {},
-                                          text: "Statistiques avancées")),
-                                ],
-                              ),
-                              Expanded(
-                                flex: 33,
-                                child: Padding(
-                                    padding: EdgeInsets.all(25),
-                                    child: RightSideWidget(
-                                      teamPlayers: teamPlayers,
-                                    )),
-                              ),
+                              Padding(
+                                  padding: EdgeInsets.only(top: 30),
+                                  child: RectangleRoundedButton(
+                                    onPressed: () {},
+                                    text: "Paramètres du match",
+                                    visible: false,
+                                  )),
+                              Padding(
+                                  padding: EdgeInsets.only(top: 20),
+                                  child: RectangleRoundedButton(
+                                    onPressed: () {},
+                                    text: "Statistiques avancées",
+                                    visible: false,
+                                  )),
+                              Spacer(),
+                              CircularButton(onPressed: () {
+                                context.push(Routes.nestedCurrentMatchPage,
+                                    extra: game);
+                              }),
+                              Spacer(),
+                              Padding(
+                                  padding: EdgeInsets.only(bottom: 20),
+                                  child: RectangleRoundedButton(
+                                      onPressed: () {},
+                                      text: "Paramètres du match")),
+                              Padding(
+                                  padding: EdgeInsets.only(bottom: 30),
+                                  child: RectangleRoundedButton(
+                                      onPressed: () {},
+                                      text: "Statistiques avancées")),
                             ],
-                          ))
+                          ),
+                          Expanded(
+                            flex: 33,
+                            child: Padding(
+                                padding: EdgeInsets.all(25),
+                                child: RightSideWidget(
+                                  teamPlayers: state.teamPlayers
+                                )),
+                          ),
                         ],
                       ))
-                ])))));
+                    ],
+                  ))
+            ])));
+      }
+      return Container();
+    })));
   }
 }
 
@@ -123,12 +131,12 @@ class RightSideWidget extends StatelessWidget {
   final List<Player> teamPlayers;
 
   const RightSideWidget({
-    super.key, required this.teamPlayers,
+    super.key,
+    required this.teamPlayers,
   });
 
   @override
   Widget build(BuildContext context) {
-
     int middleIndex = (teamPlayers.length / 2).round();
 
     List<Player> group1 = teamPlayers.sublist(0, middleIndex);
@@ -148,28 +156,34 @@ class RightSideWidget extends StatelessWidget {
                 children: [
                   Expanded(
                       child: Column(
-                        children: group1.map((player) {
-                          return PlayerSelectionWidget(
-                            isSelected: player.selected,
-                            playerName: player.name,
-                            playerNumber: player.number,
-                            onPressed: ()  {
-                              print(player.name);
-                              player.selected = !player.selected;
-                        });}).toList()
-                  )),
+                          children: group1.map((player) {
+                    return PlayerSelectionWidget(
+                        isSelected: player.selected,
+                        playerName: player.name,
+                        playerNumber: player.number,
+                        onPressed: () {
+                          if(player.selected) {
+                            context.read<MatchCubit>().unselectPlayer(player);
+                          } else {
+                            context.read<MatchCubit>().selectPlayer(player);
+                          }
+                        });
+                  }).toList())),
                   Expanded(
                       child: Column(
                           children: group2.map((player) {
-                            return PlayerSelectionWidget(
-                                isSelected: player.selected,
-                                playerName: player.name,
-                                playerNumber: player.number,
-                                onPressed: ()  {
-                                  print(player.name);
-                                  player.selected = !player.selected;
-                                });}).toList()
-                      )),
+                    return PlayerSelectionWidget(
+                        isSelected: player.selected,
+                        playerName: player.name,
+                        playerNumber: player.number,
+                        onPressed: () {
+                          if(player.selected) {
+                            context.read<MatchCubit>().unselectPlayer(player);
+                          } else {
+                            context.read<MatchCubit>().selectPlayer(player);
+                          }
+                        });
+                  }).toList())),
                 ],
               )
             ],
@@ -204,7 +218,7 @@ class PlayerSelectionWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: InkWell(
                 borderRadius: BorderRadius.circular(10),
-                splashColor: Colors.green,
+                splashColor: AppColors.orange,
                 onTap: onPressed, // Utilise la fonction passée en paramètre
                 child: Container(
                   width: double.infinity,
@@ -386,7 +400,7 @@ class RectangleRoundedButton extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           splashColor: Colors.deepOrange,
-          onTap: onPressed, // Utilise la fonction passée en paramètre
+          onTap: onPressed,
           child: Container(
             width: 160,
             height: 45,
