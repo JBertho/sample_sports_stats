@@ -40,24 +40,32 @@ class _CurrentMatchPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Match en cours"),
         ),
-        body: SafeArea(
-            child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
-                builder: (context, state) => Column(children: [
-                      Text("Contre $name",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          )),
-                      if(state is CurrentGameInProgress) Text(
-                        "${state.teamScore} - ${state.opponentScore}",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if(state is CurrentGameInProgress)
-                        Expanded(child: CurrentGame(state: state, teamPlayers: teamPlayers, opponentPlayers: opponentsPlayers,))
-                    ]))));
+        body: SafeArea(child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
+            builder: (context, state) {
+              var atHomeValue = game.atHome ? 'à domicile' : 'à l\'exterieur';
+          return Column(children: [
+            Text("Contre $name $atHomeValue",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                )),
+            if (state is CurrentGameInProgress)
+              Text(
+                "${state.teamScore} - ${state.opponentScore}",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            if (state is CurrentGameInProgress)
+              Expanded(
+                  child: CurrentGame(
+                state: state,
+                teamPlayers: teamPlayers,
+                opponentPlayers: opponentsPlayers,
+              ))
+          ]);
+        })));
   }
 }
 
@@ -65,11 +73,15 @@ class CurrentGame extends StatelessWidget {
   final CurrentGameInProgress state;
   final List<MatchPlayer> teamPlayers;
   final List<MatchPlayer> opponentPlayers;
-  const CurrentGame({super.key, required this.state, required this.teamPlayers, required this.opponentPlayers});
+
+  const CurrentGame(
+      {super.key,
+      required this.state,
+      required this.teamPlayers,
+      required this.opponentPlayers});
 
   @override
   Widget build(BuildContext context) {
-
     var actions = ActionGame.values;
 
     return Row(children: [
@@ -79,38 +91,40 @@ class CurrentGame extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Column(
-                  mainAxisAlignment:
-                  MainAxisAlignment.spaceAround,
-                  crossAxisAlignment:
-                  CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: teamPlayers
                       .map((player) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10),
-                      child: PlayerButton(
-                        color: state.selectedPlayer != player ?  Colors.blue : Colors.pink,
-                        playerName: player.name,
-                        playerNumber: player.number,
-                        callback: () => {
-                        context.read<CurrentGameCubit>().selectPlayer(player)
-                      },
-                      )))
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: PlayerButton(
+                            color: state.selectedPlayer != player
+                                ? Colors.blue
+                                : Colors.pink,
+                            playerName: player.name,
+                            playerNumber: player.number,
+                            callback: () => {
+                              context
+                                  .read<CurrentGameCubit>()
+                                  .selectPlayer(player)
+                            },
+                          )))
                       .toList()),
               Column(
-                  mainAxisAlignment:
-                  MainAxisAlignment.spaceAround,
-                  crossAxisAlignment:
-                  CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: opponentPlayers
                       .map((player) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10),
-                      child: PlayerButton(
-                        color: state.selectedPlayer != player ?  Colors.red : Colors.pink,
-                        playerName: player.name,
-                        playerNumber: player.number,
-                        callback: () => context.read<CurrentGameCubit>().selectPlayer(player),
-                      )))
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: PlayerButton(
+                            color: state.selectedPlayer != player
+                                ? Colors.red
+                                : Colors.pink,
+                            playerName: player.name,
+                            playerNumber: player.number,
+                            callback: () => context
+                                .read<CurrentGameCubit>()
+                                .selectPlayer(player),
+                          )))
                       .toList()),
             ],
           )),
@@ -134,7 +148,8 @@ class CurrentGame extends StatelessWidget {
                   itemCount: state.histories.length, // Nombre d'événements
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text('${state.histories[index].player.name } => ${state.histories[index].actionGame.name}'),
+                      title: Text(
+                          '${state.histories[index].player.name} => ${state.histories[index].actionGame.name}'),
                     );
                   },
                 ),
@@ -152,7 +167,8 @@ class CurrentGame extends StatelessWidget {
     ]);
   }
 
-  List<Widget> _buildActionRows(List<ActionGame> actions, BuildContext context, ActionGame? selectedActionGame) {
+  List<Widget> _buildActionRows(List<ActionGame> actions, BuildContext context,
+      ActionGame? selectedActionGame) {
     List<Widget> rows = [];
 
     var firstColumn = actions.sublist(0, actions.length ~/ 2);
@@ -165,7 +181,7 @@ class CurrentGame extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Actionbutton(
                 text: action.name,
-                color: selectedActionGame != action ?  Colors.lime : Colors.pink,
+                color: selectedActionGame != action ? Colors.lime : Colors.pink,
                 callback: () {
                   context.read<CurrentGameCubit>().selectActionGame(action);
                   if (action.type == ActionType.point) {
@@ -210,10 +226,7 @@ class CurrentGame extends StatelessWidget {
 
     return rows;
   }
-
-
 }
-
 
 class MyApp extends StatelessWidget {
   @override
