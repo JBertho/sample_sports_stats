@@ -22,6 +22,7 @@ class LayoutScaffold extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: navigationShell.goBranch,
+        backgroundColor: Colors.white,
         destinations: destinations.map((destination) => NavigationDestination(
               icon: Icon(destination.icon),
               label: destination.label,

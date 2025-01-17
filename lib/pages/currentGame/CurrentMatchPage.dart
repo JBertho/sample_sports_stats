@@ -2,14 +2,20 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sample_sport_stats/AppColors.dart';
+import 'package:sample_sport_stats/AppFontStyle.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameCubit.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameState.dart';
+import 'package:sample_sport_stats/pages/currentGame/widget/GameHeader.dart';
+import 'package:sample_sport_stats/pages/currentGame/widget/TimerAndHistory.dart';
 import 'package:sample_sport_stats/widgets/PlayerButton.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/Game.dart';
 import '../../widgets/ActionButton.dart';
+import 'model/ChronometerModel.dart';
 
 class CurrentMatchPage extends StatelessWidget {
   final Game game;
@@ -32,40 +38,46 @@ class _CurrentMatchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var name = game.opponentName;
+    var name = "NOM D'EQUIPE";
+    var opponentName = game.opponentName;
     var teamPlayers = game.teamPlayers;
     var opponentsPlayers = game.opponentPlayers;
 
     return Scaffold(
+        backgroundColor: AppColors.bg,
         appBar: AppBar(
           title: const Text("Match en cours"),
+          backgroundColor: Colors.white,
         ),
-        body: SafeArea(child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
+        body:  ChangeNotifierProvider(
+    create: (_) => ChronometerModel(),  // Fournir le modèle ChronometerModel
+    child: Consumer<ChronometerModel>(
+    builder: (context, chronometerModel, child) {
+    return SafeArea(child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
             builder: (context, state) {
-              var atHomeValue = game.atHome ? 'à domicile' : 'à l\'exterieur';
-          return Column(children: [
-            Text("Contre $name $atHomeValue",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                )),
-            if (state is CurrentGameInProgress)
-              Text(
-                "${state.teamScore} - ${state.opponentScore}",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            if (state is CurrentGameInProgress)
+          var atHomeValue = game.atHome ? 'à domicile' : 'à l\'exterieur';
+          if (state is CurrentGameInProgress) {
+            return Column(children: [
+
+              Padding(padding: const EdgeInsets.only(top: 30), child: GameHeader(
+                  opponentName: opponentName,
+                  atHomeValue: atHomeValue,
+                  teamName: name,
+                  teamScore: game.teamScore,
+                  opponentScore: game.opponentScore)),
+
               Expanded(
                   child: CurrentGame(
                 state: state,
                 teamPlayers: teamPlayers,
                 opponentPlayers: opponentsPlayers,
+                      chronometerModel: chronometerModel
               ))
-          ]);
-        })));
+            ]);
+          }
+          //TODO
+          return Container();
+        }));})));
   }
 }
 
@@ -73,12 +85,13 @@ class CurrentGame extends StatelessWidget {
   final CurrentGameInProgress state;
   final List<MatchPlayer> teamPlayers;
   final List<MatchPlayer> opponentPlayers;
+  final ChronometerModel chronometerModel;
 
   const CurrentGame(
       {super.key,
       required this.state,
       required this.teamPlayers,
-      required this.opponentPlayers});
+      required this.opponentPlayers, required this.chronometerModel});
 
   @override
   Widget build(BuildContext context) {
@@ -129,34 +142,8 @@ class CurrentGame extends StatelessWidget {
             ],
           )),
       Expanded(
-        flex: 30, // 30% de l'écran
-        child: Container(
-          color: Colors.white,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Historique',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: state.histories.length, // Nombre d'événements
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(
-                          '${state.histories[index].player.name} => ${state.histories[index].actionGame.name}'),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+        flex: 30,
+        child: TimerAndHistory(state: state, chronometerModel: chronometerModel),
       ),
       Expanded(
           flex: 35,

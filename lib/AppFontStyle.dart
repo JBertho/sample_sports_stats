@@ -8,4 +8,12 @@ class AppFontStyle {
   static TextStyle header = GoogleFonts.anton(
       textStyle: const TextStyle(
           fontSize: 40, color: AppColors.blue));
+
+  static TextStyle scoreHeader = GoogleFonts.anton(
+      textStyle: const TextStyle(
+          fontSize: 32, color: AppColors.blue));
+
+  static TextStyle smallComplement = GoogleFonts.anton(
+      textStyle: const TextStyle(
+          fontSize: 16, color: AppColors.greyComplement));
 }
