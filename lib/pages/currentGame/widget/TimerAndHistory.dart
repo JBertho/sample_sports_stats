@@ -1,10 +1,16 @@
-import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sample_sport_stats/AppColors.dart';
 import 'package:sample_sport_stats/AppFontStyle.dart';
+import 'package:provider/provider.dart';
+import 'package:sample_sport_stats/models/ActionGame.dart';
+import 'package:sample_sport_stats/models/History.dart';
+import 'package:sample_sport_stats/pages/currentGame/extension/DurationExtension.dart';
 
+
+import '../logic/CurrentGameCubit.dart';
 import '../logic/CurrentGameState.dart';
 import '../model/ChronometerModel.dart';
 
@@ -12,11 +18,46 @@ import '../model/ChronometerModel.dart';
 class TimerAndHistory extends StatelessWidget {
   const TimerAndHistory({
     super.key,
-    required this.state, required this.chronometerModel,
+    required this.state
   });
 
   final CurrentGameInProgress state;
-  final ChronometerModel chronometerModel;
+
+
+  Widget buildHistoryString(History history) {
+    if(history.actionGame.type == ActionType.failedShot) {
+      return RichText(text: TextSpan(
+          style: AppFontStyle.anton.copyWith(color: Colors.black),
+        children: [
+          TextSpan(text: history.actionGame.name, style: const TextStyle(color: Colors.red)),
+          const TextSpan(text: " de "),
+          TextSpan(text: history.player.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ]
+      ));
+    }
+    if(history.actionGame.type == ActionType.point) {
+      return RichText(text: TextSpan(
+          style: AppFontStyle.anton.copyWith(color: Colors.black),
+          children: [
+            TextSpan(text: history.actionGame.name, style: const TextStyle(color: Colors.green)),
+            const TextSpan(text: " de "),
+            TextSpan(text: history.player.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ]
+      ));
+    }
+    if(history.actionGame.type == ActionType.fault) {
+      return RichText(text: TextSpan(
+          style: AppFontStyle.anton.copyWith(color: Colors.black),
+          children: [
+            TextSpan(text: history.actionGame.name, style: const TextStyle(color: Colors.red)),
+            const TextSpan(text: " de "),
+            TextSpan(text: history.player.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ]
+      ));
+    }
+    return Text("NOT_DEFINED");
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +70,27 @@ class TimerAndHistory extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Chronometer(periodNumber: 1, chronometerModel: chronometerModel),
+      Consumer<ChronometerModel>(
+      builder: (context, chronometerModel, child)  {
+        log(chronometerModel.elapsedTime.toString());
+        return Chronometer(periodNumber: 1, chronometerModel: chronometerModel,);}),
           Expanded(
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: state.histories.length,
+
               itemBuilder: (context, index) {
+                var history = state.histories.reversed.toList()[index];
                 return ListTile(
-                  title: Text(
-                      '${state.histories[index].player.name} => ${state.histories[index].actionGame.name}'),
+                  title: Text(history.elapsedTime.formatToHoursMinutesAndSeconds()),
+                  subtitle: buildHistoryString(history),
+                  trailing: IconButton(icon: const Icon(Icons.close, color: AppColors.greyComplement,), onPressed: () {
+                    context.read<CurrentGameCubit>().deleteHistory(history);
+
+                  },),
                 );
-              },
+              }, separatorBuilder: (BuildContext context, int index) {
+                return const Divider(indent: 20, endIndent: 20,color: AppColors.grey,);
+            },
             ),
           ),
         ],
@@ -62,12 +114,6 @@ class Chronometer extends StatefulWidget {
 class _ChronometerState extends State<Chronometer> {
   late String _elapsedTimeString;
 
-  @override
-  void initState() {
-    super.initState();
-
-    _elapsedTimeString = _formatElapsedTime(widget.chronometerModel.elapsedTime);
-  }
 
   void _startStopwatch() {
     widget.chronometerModel.startStopwatch();
@@ -86,7 +132,7 @@ class _ChronometerState extends State<Chronometer> {
   }
 
   String _formatElapsedTime(Duration time) {
-    return '${time.inHours.remainder(24).toString().padLeft(2, '0')} : ${time.inMinutes.remainder(60).toString().padLeft(2, '0')} : ${(time.inSeconds.remainder(60)).toString().padLeft(2, '0')}';
+    return time.formatToHoursMinutesAndSeconds();
   }
 
   @override
@@ -96,10 +142,11 @@ class _ChronometerState extends State<Chronometer> {
 
   @override
   Widget build(BuildContext context) {
+    var values = _formatElapsedTime(widget.chronometerModel.elapsedTime);
     return Column(
       children: [
         Text(
-          _elapsedTimeString,
+          values,
           style: const TextStyle(fontSize: 32.0),
         ),
         const SizedBox(height: 2.0),
@@ -117,7 +164,7 @@ class _ChronometerState extends State<Chronometer> {
                 width: 69,
                 height: 69,
                 child: Center(
-                  child: Icon(false ?  Icons.pause : Icons.play_arrow, size: 40, color: Colors.white,),
+                  child: Icon(widget.chronometerModel.isRunning() ?  Icons.pause : Icons.play_arrow, size: 40, color: Colors.white,),
                 ),
               ),
             ))

@@ -5,6 +5,7 @@ class History {
   final ActionGame actionGame;
   final MatchPlayer player;
   final MatchPlayer? opponent;
+  final Duration elapsedTime;
 
-  History({required this.actionGame, required this.player, this.opponent});
+  History({required this.actionGame, required this.player, this.opponent, required this.elapsedTime});
 }

@@ -15,7 +15,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         teamScore: 0, opponentScore: 0, histories: List.empty()));
   }
 
-  void selectPlayer(MatchPlayer player) {
+  void selectPlayer(MatchPlayer player, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
 
     if (currentState.selectedAction == null) {
@@ -25,11 +25,11 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           opponentScore: currentState.opponentScore,
           histories: currentState.histories));
     } else {
-      saveAction(player, currentState.selectedAction!);
+      saveAction(player, currentState.selectedAction!, elapsedTime);
     }
   }
 
-  void selectActionGame(ActionGame actionGame) {
+  void selectActionGame(ActionGame actionGame, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
 
     if (currentState.selectedPlayer == null) {
@@ -39,15 +39,15 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           opponentScore: currentState.opponentScore,
           histories: currentState.histories));
     } else {
-      saveAction(currentState.selectedPlayer!, actionGame);
+      saveAction(currentState.selectedPlayer!, actionGame, elapsedTime);
     }
   }
 
-  void saveAction(MatchPlayer player, ActionGame actionGame) {
+  void saveAction(MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
 
     var histories = currentState.histories;
-    var history = History(actionGame: actionGame, player: player);
+    var history = History(actionGame: actionGame, player: player, elapsedTime: elapsedTime);
     var newHistories = List.of(histories);
     newHistories.add(history);
 
@@ -56,6 +56,33 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           teamScore: currentState.teamScore + actionGame.value,
           opponentScore: currentState.opponentScore,
           histories: newHistories));
+    }
+    if (actionGame.type == ActionType.fault) {
+      emit(CurrentGameInProgress(
+          teamScore: currentState.teamScore,
+          opponentScore: currentState.opponentScore,
+          histories: newHistories));
+    }
+    if (actionGame.type == ActionType.failedShot) {
+      emit(CurrentGameInProgress(
+          teamScore: currentState.teamScore,
+          opponentScore: currentState.opponentScore,
+          histories: newHistories));
+    }
+  }
+
+  void deleteHistory(History history) {
+    var currentState = state as CurrentGameInProgress;
+    var histories = currentState.histories;
+
+    var containHistory = histories.contains(history);
+    if(containHistory) {
+      histories.remove(history);
+      emit(CurrentGameInProgress(
+          selectedAction: currentState.selectedAction,
+          teamScore: currentState.teamScore,
+          opponentScore: currentState.opponentScore,
+          histories: histories));
     }
   }
 }

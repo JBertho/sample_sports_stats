@@ -3,11 +3,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sample_sport_stats/AppColors.dart';
-import 'package:sample_sport_stats/AppFontStyle.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameCubit.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameState.dart';
+import 'package:sample_sport_stats/pages/currentGame/widget/ActionsSide.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/GameHeader.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/TimerAndHistory.dart';
 import 'package:sample_sport_stats/widgets/PlayerButton.dart';
@@ -25,7 +25,9 @@ class CurrentMatchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<CurrentGameCubit>(
-      create: (_) => CurrentGameCubit()..initGame(),
+      create: (_) =>
+      CurrentGameCubit()
+        ..initGame(),
       child: _CurrentMatchPage(game: game),
     );
   }
@@ -49,35 +51,39 @@ class _CurrentMatchPage extends StatelessWidget {
           title: const Text("Match en cours"),
           backgroundColor: Colors.white,
         ),
-        body:  ChangeNotifierProvider(
-    create: (_) => ChronometerModel(),  // Fournir le modèle ChronometerModel
-    child: Consumer<ChronometerModel>(
-    builder: (context, chronometerModel, child) {
-    return SafeArea(child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
-            builder: (context, state) {
-          var atHomeValue = game.atHome ? 'à domicile' : 'à l\'exterieur';
-          if (state is CurrentGameInProgress) {
-            return Column(children: [
+        body: ChangeNotifierProvider(
+            create: (_) => ChronometerModel(),
+            // Fournir le modèle ChronometerModel
+            child:
+                  SafeArea(
+                      child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
+                          builder: (context, state) {
+                            var atHomeValue = game.atHome
+                                ? 'à domicile'
+                                : 'à l\'exterieur';
+                            if (state is CurrentGameInProgress) {
+                              return Column(children: [
 
-              Padding(padding: const EdgeInsets.only(top: 30), child: GameHeader(
-                  opponentName: opponentName,
-                  atHomeValue: atHomeValue,
-                  teamName: name,
-                  teamScore: game.teamScore,
-                  opponentScore: game.opponentScore)),
+                                Padding(padding: const EdgeInsets.only(top: 30),
+                                    child: GameHeader(
+                                        opponentName: opponentName,
+                                        atHomeValue: atHomeValue,
+                                        teamName: name,
+                                        teamScore: game.teamScore,
+                                        opponentScore: game.opponentScore)),
 
-              Expanded(
-                  child: CurrentGame(
-                state: state,
-                teamPlayers: teamPlayers,
-                opponentPlayers: opponentsPlayers,
-                      chronometerModel: chronometerModel
-              ))
-            ]);
-          }
-          //TODO
-          return Container();
-        }));})));
+                                Expanded(
+                                    child: CurrentGame(
+                                        state: state,
+                                        teamPlayers: teamPlayers,
+                                        opponentPlayers: opponentsPlayers,
+                                    ))
+                              ]);
+                            }
+                            //TODO
+                            return Container();
+                          }))
+                ));
   }
 }
 
@@ -85,13 +91,11 @@ class CurrentGame extends StatelessWidget {
   final CurrentGameInProgress state;
   final List<MatchPlayer> teamPlayers;
   final List<MatchPlayer> opponentPlayers;
-  final ChronometerModel chronometerModel;
 
-  const CurrentGame(
-      {super.key,
-      required this.state,
-      required this.teamPlayers,
-      required this.opponentPlayers, required this.chronometerModel});
+  const CurrentGame({super.key,
+    required this.state,
+    required this.teamPlayers,
+    required this.opponentPlayers});
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +111,8 @@ class CurrentGame extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: teamPlayers
-                      .map((player) => Padding(
+                      .map((player) =>
+                      Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: PlayerButton(
                             color: state.selectedPlayer != player
@@ -115,10 +120,12 @@ class CurrentGame extends StatelessWidget {
                                 : Colors.pink,
                             playerName: player.name,
                             playerNumber: player.number,
-                            callback: () => {
+                            callback: ()
+                            {
+                              var elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
                               context
                                   .read<CurrentGameCubit>()
-                                  .selectPlayer(player)
+                                  .selectPlayer(player, elapsedTime);
                             },
                           )))
                       .toList()),
@@ -126,7 +133,8 @@ class CurrentGame extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: opponentPlayers
-                      .map((player) => Padding(
+                      .map((player) =>
+                      Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: PlayerButton(
                             color: state.selectedPlayer != player
@@ -134,23 +142,25 @@ class CurrentGame extends StatelessWidget {
                                 : Colors.pink,
                             playerName: player.name,
                             playerNumber: player.number,
-                            callback: () => context
-                                .read<CurrentGameCubit>()
-                                .selectPlayer(player),
+                            callback: () {
+                              var  elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
+
+                              context
+                                    .read<CurrentGameCubit>()
+                                    .selectPlayer(player, elapsedTime);
+                            }
                           )))
                       .toList()),
             ],
           )),
       Expanded(
         flex: 30,
-        child: TimerAndHistory(state: state, chronometerModel: chronometerModel),
+        child: Padding(padding: const EdgeInsets.only(bottom: 20), child: TimerAndHistory(
+            state: state)),
       ),
       Expanded(
           flex: 35,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: _buildActionRows(actions, context, state.selectedAction),
-          ))
+          child: ActionsSide())
     ]);
   }
 
@@ -170,16 +180,9 @@ class CurrentGame extends StatelessWidget {
                 text: action.name,
                 color: selectedActionGame != action ? Colors.lime : Colors.pink,
                 callback: () {
-                  context.read<CurrentGameCubit>().selectActionGame(action);
-                  if (action.type == ActionType.point) {
-                    log("PANIER");
-                  }
-                  if (action.type == ActionType.failedShot) {
-                    log("RATE");
-                  }
-                  if (action.type == ActionType.fault) {
-                    log("FAUTE");
-                  }
+                  var  elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
+
+                  context.read<CurrentGameCubit>().selectActionGame(action, elapsedTime);
                 },
               ));
         }).toList(),
@@ -194,17 +197,11 @@ class CurrentGame extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Actionbutton(
                 text: action.name,
-                color: Colors.lime,
+                color: selectedActionGame != action ? Colors.lime : Colors.pink,
                 callback: () {
-                  if (action.type == ActionType.point) {
-                    log("PANIER");
-                  }
-                  if (action.type == ActionType.failedShot) {
-                    log("RATE");
-                  }
-                  if (action.type == ActionType.fault) {
-                    log("FAUTE");
-                  }
+                  var  elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
+
+                  context.read<CurrentGameCubit>().selectActionGame(action, elapsedTime);
                 },
               ));
         }).toList(),
@@ -215,69 +212,3 @@ class CurrentGame extends StatelessWidget {
   }
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('3 Colonnes Layout'),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  // Colonne de gauche
-                  Expanded(
-                    flex: 35, // 35% de l'écran
-                    child: Container(
-                      color: Colors.blueAccent,
-                    ),
-                  ),
-                  // Colonne du milieu
-                  Expanded(
-                    flex: 30, // 30% de l'écran
-                    child: Container(
-                      color: Colors.white,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Historique',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: 10, // Nombre d'événements
-                              itemBuilder: (context, index) {
-                                return ListTile(
-                                  title: Text('Événement ${index + 1}'),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Colonne de droite
-                  Expanded(
-                    flex: 35, // 35% de l'écran
-                    child: Container(
-                      color: Colors.greenAccent,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
