@@ -55,16 +55,16 @@ class PlayerSide extends StatelessWidget {
         Column(
           children: [
             Text("Adversaire", style: AppFontStyle.anton,),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             OpponentBtn(
                 callback: () {
                   var  elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
                   context
                       .read<CurrentGameCubit>()
-                      .selectPlayer(opponentPlayer, elapsedTime);
+                      .selectOpponentPlayer(opponentPlayer, elapsedTime);
                 },
                 displayValue: opponentPlayer.name,
-                color: state.selectedPlayer != opponentPlayer ? AppColors.darkBlueBtn : AppColors.darkBlueBtnSelected,
+                color: state.selectedOpponentPlayer != opponentPlayer ? AppColors.darkBlueBtn : AppColors.darkBlueBtnSelected,
                 splashColor: Colors.blueAccent),
           ],
         )

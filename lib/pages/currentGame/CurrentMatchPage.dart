@@ -60,8 +60,8 @@ class _CurrentMatchPage extends StatelessWidget {
                           opponentName: opponentName,
                           atHomeValue: atHomeValue,
                           teamName: name,
-                          teamScore: game.teamScore,
-                          opponentScore: game.opponentScore)),
+                          teamScore: state.teamScore,
+                          opponentScore: state.opponentScore)),
                   Expanded(
                       child: CurrentGame(
                           state: state,

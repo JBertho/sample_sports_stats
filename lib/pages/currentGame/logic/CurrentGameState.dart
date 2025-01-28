@@ -20,7 +20,8 @@ class CurrentGameInitial extends CurrentGameState {
 class CurrentGameInProgress extends CurrentGameState {
   final MatchPlayer? selectedPlayer;
   final ActionGame? selectedAction;
+  final MatchPlayer? selectedOpponentPlayer;
 
-  CurrentGameInProgress({this.selectedPlayer, this.selectedAction, required super.teamScore, required super.opponentScore, required super.histories});
+  CurrentGameInProgress({this.selectedPlayer, this.selectedAction, this.selectedOpponentPlayer, required super.teamScore, required super.opponentScore, required super.histories});
 
 }

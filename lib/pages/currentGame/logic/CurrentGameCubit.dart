@@ -31,30 +31,83 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     }
   }
 
+  void selectOpponentPlayer(MatchPlayer opponent, Duration elapsedTime) {
+    var currentState = state as CurrentGameInProgress;
+
+    if (currentState.selectedAction == null) {
+      emit(CurrentGameInProgress(
+          selectedOpponentPlayer: opponent,
+          teamScore: currentState.teamScore,
+          opponentScore: currentState.opponentScore,
+          histories: currentState.histories));
+    } else {
+      saveOpponentAction(opponent, currentState.selectedAction!, elapsedTime);
+    }
+  }
+
   void selectActionGame(ActionGame actionGame, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
 
-    if (currentState.selectedPlayer == null) {
+    if (currentState.selectedPlayer == null &&
+        currentState.selectedOpponentPlayer == null) {
       emit(CurrentGameInProgress(
           selectedAction: actionGame,
           teamScore: currentState.teamScore,
           opponentScore: currentState.opponentScore,
           histories: currentState.histories));
+    } else if (currentState.selectedOpponentPlayer != null) {
+      saveOpponentAction(currentState.selectedOpponentPlayer!, actionGame, elapsedTime);
     } else {
       saveAction(currentState.selectedPlayer!, actionGame, elapsedTime);
     }
   }
 
-  void saveAction(MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
-    log("SAVINNG");
+  void saveOpponentAction(
+      MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
+    //TODO : temporaire le temps de gérer l'équipe dans les states
+    log("SAVINNG OOPPPO");
     var currentState = state as CurrentGameInProgress;
 
     var histories = currentState.histories;
-    var history = History(actionGame: actionGame, player: player, elapsedTime: elapsedTime);
+    var history = History(
+        actionGame: actionGame, player: player, elapsedTime: elapsedTime);
     var newHistories = List.of(histories);
     newHistories.add(history);
 
-    switch(actionGame.type) {
+    switch (actionGame.type) {
+      case ActionType.point:
+        currentState.opponentScore =
+            currentState.opponentScore + actionGame.value;
+        break;
+      case ActionType.fault:
+        //add fault
+        break;
+      case ActionType.failedShot:
+      //handle background stats
+      case ActionType.rebound:
+      //handle background stats
+      case ActionType.turnover:
+      //handle background stats
+      case ActionType.counter:
+      //handle background stats
+    }
+    emit(CurrentGameInProgress(
+        teamScore: currentState.teamScore,
+        opponentScore: currentState.opponentScore,
+        histories: newHistories));
+  }
+
+  void saveAction(
+      MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
+    var currentState = state as CurrentGameInProgress;
+
+    var histories = currentState.histories;
+    var history = History(
+        actionGame: actionGame, player: player, elapsedTime: elapsedTime);
+    var newHistories = List.of(histories);
+    newHistories.add(history);
+
+    switch (actionGame.type) {
       case ActionType.point:
         currentState.teamScore = currentState.teamScore + actionGame.value;
         break;
@@ -62,13 +115,13 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         //add fault
         break;
       case ActionType.failedShot:
-        //handle background stats
+      //handle background stats
       case ActionType.rebound:
-        //handle background stats
+      //handle background stats
       case ActionType.turnover:
-        //handle background stats
+      //handle background stats
       case ActionType.counter:
-        //handle background stats
+      //handle background stats
     }
     emit(CurrentGameInProgress(
         teamScore: currentState.teamScore,
@@ -81,7 +134,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     var histories = currentState.histories;
 
     var containHistory = histories.contains(history);
-    if(containHistory) {
+    if (containHistory) {
       histories.remove(history);
       emit(CurrentGameInProgress(
           selectedAction: currentState.selectedAction,
