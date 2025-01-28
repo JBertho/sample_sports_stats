@@ -25,37 +25,27 @@ class MatchPage extends StatelessWidget {
 }
 
 class _MatchPage extends StatelessWidget {
-
   final TextEditingController opponentNameController = TextEditingController();
-  final Game game = Game(opponentName: "Charly Bertho", teamPlayers: [
-    MatchPlayer(name: "Jamso", number: 1),
-    MatchPlayer(name: "Carlito", number: 14),
-    MatchPlayer(name: "Jean", number: 5),
-    MatchPlayer(name: "Paul", number: 231),
-    MatchPlayer(name: "Claude", number: 4),
-  ], opponentPlayers: [
-    MatchPlayer(name: "Leona", number: 8),
-    MatchPlayer(name: "Ezreal", number: 16),
-    MatchPlayer(name: "K'Santé", number: 48),
-    MatchPlayer(name: "Lux", number: 32),
-    MatchPlayer(name: "Kindred", number: 2),
-  ]);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: SafeArea(child:
-        BlocListener<MatchCubit, MatchState>(listener: (context, state) {
-          if( state is BeginMatchState) {
-            var newGame = Game(opponentName: state.opponentName,
-                atHome: state.atHome,
-                teamPlayers: state.selectedPlayers.map((player) => MatchPlayer(name: player.name, number: player.number)).toList(),
-                opponentPlayers: game.opponentPlayers);
-            context.push(Routes.nestedCurrentMatchPage,
-                extra: newGame);
-          }
-    },child:
-        BlocBuilder<MatchCubit, MatchState>(
-            builder: (context, state) {
+    return Scaffold(
+        body: SafeArea(
+            child: BlocListener<MatchCubit, MatchState>(
+                listener: (context, state) {
+      if (state is BeginMatchState) {
+        var newGame = Game(
+          opponentName: state.opponentName,
+          atHome: state.atHome,
+          teamPlayers: state.selectedPlayers
+              .map((player) =>
+                  MatchPlayer(name: player.name, number: player.number))
+              .toList(),
+          opponentPlayer: MatchPlayer(name: state.opponentName, number: 0),
+        );
+        context.push(Routes.nestedCurrentMatchPage, extra: newGame);
+      }
+    }, child: BlocBuilder<MatchCubit, MatchState>(builder: (context, state) {
       if (state is MatchStateInProgress) {
         return Container(
             color: AppColors.grey,
@@ -81,18 +71,18 @@ class _MatchPage extends StatelessWidget {
                             child: Padding(
                                 padding: const EdgeInsets.all(25),
                                 child: OpponentGameConfiguration(
-                                  atHome: state.atHome,
-                                  opponentNameController: opponentNameController
-                                )),
+                                    atHome: state.atHome,
+                                    opponentNameController:
+                                        opponentNameController)),
                           ),
-                          StartGameAndParameters(game: game, opponentNameController: opponentNameController),
+                          StartGameAndParameters(
+                              opponentNameController: opponentNameController),
                           Expanded(
                             flex: 33,
                             child: Padding(
                                 padding: const EdgeInsets.all(25),
                                 child: RightSideWidget(
-                                  teamPlayers: state.teamPlayers
-                                )),
+                                    teamPlayers: state.teamPlayers)),
                           ),
                         ],
                       ))
@@ -108,10 +98,9 @@ class _MatchPage extends StatelessWidget {
 class StartGameAndParameters extends StatelessWidget {
   const StartGameAndParameters({
     super.key,
-    required this.game, required this.opponentNameController,
+    required this.opponentNameController,
   });
 
-  final Game game;
   final TextEditingController opponentNameController;
 
   @override
@@ -141,13 +130,11 @@ class StartGameAndParameters extends StatelessWidget {
         Padding(
             padding: EdgeInsets.only(bottom: 20),
             child: RectangleAnimatedButton(
-                onPressed: () {},
-                text: "Paramètres du match")),
+                onPressed: () {}, text: "Paramètres du match")),
         Padding(
             padding: EdgeInsets.only(bottom: 30),
             child: RectangleAnimatedButton(
-                onPressed: () {},
-                text: "Statistiques avancées")),
+                onPressed: () {}, text: "Statistiques avancées")),
       ],
     );
   }
@@ -163,7 +150,6 @@ class RightSideWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -175,10 +161,11 @@ class RightSideWidget extends StatelessWidget {
           child: Column(
             children: [
               const Text("Choix de mes joueurs : "),
-              Flexible(child:  GridView.count(
+              Flexible(
+                  child: GridView.count(
                 primary: false,
                 padding: const EdgeInsets.all(20),
-                crossAxisSpacing:10,
+                crossAxisSpacing: 10,
                 mainAxisSpacing: 5,
                 crossAxisCount: 2,
                 childAspectRatio: 1.5,
@@ -188,7 +175,7 @@ class RightSideWidget extends StatelessWidget {
                       playerName: player.name,
                       playerNumber: player.number,
                       onPressed: () {
-                        if(player.selected) {
+                        if (player.selected) {
                           context.read<MatchCubit>().unselectPlayer(player);
                         } else {
                           context.read<MatchCubit>().selectPlayer(player);
@@ -264,11 +251,13 @@ class PlayerSelectionWidget extends StatelessWidget {
 }
 
 class OpponentGameConfiguration extends StatelessWidget {
-
   final bool atHome;
   final TextEditingController opponentNameController;
+
   const OpponentGameConfiguration({
-    super.key, required this.atHome, required this.opponentNameController,
+    super.key,
+    required this.atHome,
+    required this.opponentNameController,
   });
 
   @override
@@ -297,15 +286,22 @@ class OpponentGameConfiguration extends StatelessWidget {
                     flex: 5,
                     child: Padding(
                         padding: EdgeInsets.only(top: 10, right: 10),
-                        child: SideSelectionButton(onPressed: () => {context.read<MatchCubit>().updateAtHome()},
-                          text: "Domicile",isSelected: atHome,))),
+                        child: SideSelectionButton(
+                          onPressed: () =>
+                              {context.read<MatchCubit>().updateAtHome()},
+                          text: "Domicile",
+                          isSelected: atHome,
+                        ))),
                 Expanded(
                     flex: 5,
                     child: Padding(
                         padding: const EdgeInsets.only(top: 10, left: 10),
                         child: SideSelectionButton(
-                          onPressed: () => {context.read<MatchCubit>().updateAtHome()},
-                          text: "Exterieur", isSelected: !atHome,))),
+                          onPressed: () =>
+                              {context.read<MatchCubit>().updateAtHome()},
+                          text: "Exterieur",
+                          isSelected: !atHome,
+                        ))),
               ],
             ),
             Expanded(
@@ -384,7 +380,11 @@ class RectangleAnimatedButton extends StatelessWidget {
   final double height;
 
   RectangleAnimatedButton(
-      {required this.onPressed, required this.text, this.visible = true, this.width = 160, this.height = 45});
+      {required this.onPressed,
+      required this.text,
+      this.visible = true,
+      this.width = 160,
+      this.height = 45});
 
   @override
   Widget build(BuildContext context) {
@@ -464,5 +464,3 @@ class SideSelectionButton extends StatelessWidget {
                 ))));
   }
 }
-
-
