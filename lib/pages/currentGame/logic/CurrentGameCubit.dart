@@ -56,7 +56,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           opponentScore: currentState.opponentScore,
           histories: currentState.histories));
     } else if (currentState.selectedOpponentPlayer != null) {
-      saveOpponentAction(currentState.selectedOpponentPlayer!, actionGame, elapsedTime);
+      saveOpponentAction(
+          currentState.selectedOpponentPlayer!, actionGame, elapsedTime);
     } else {
       saveAction(currentState.selectedPlayer!, actionGame, elapsedTime);
     }

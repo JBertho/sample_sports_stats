@@ -1,13 +1,11 @@
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sample_sport_stats/AppColors.dart';
 import 'package:sample_sport_stats/AppFontStyle.dart';
 
 import '../../../models/ActionGame.dart';
-import 'package:provider/provider.dart';
-
 import '../logic/CurrentGameCubit.dart';
 import '../model/ChronometerModel.dart';
 
@@ -38,14 +36,18 @@ class ActionsSide extends StatelessWidget {
                     callback: () => selectAction(context, ActionGame.freeThrow),
                     displayValue: '+1',
                     fontSize: 40,
-                    color: selectedActionGame == ActionGame.freeThrow ? AppColors.greenBtnSelected :  AppColors.greenBtn)),
+                    color: selectedActionGame == ActionGame.freeThrow
+                        ? AppColors.greenBtnSelected
+                        : AppColors.greenBtn)),
             Padding(
                 padding: EdgeInsets.only(right: 6, left: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.twoPoint),
                     displayValue: '+2',
                     fontSize: 40,
-                    color: selectedActionGame == ActionGame.twoPoint ? AppColors.greenBtnSelected :  AppColors.greenBtn)),
+                    color: selectedActionGame == ActionGame.twoPoint
+                        ? AppColors.greenBtnSelected
+                        : AppColors.greenBtn)),
             Padding(
                 padding: EdgeInsets.only(left: 6),
                 child: ActionBtn(
@@ -53,7 +55,9 @@ class ActionsSide extends StatelessWidget {
                         selectAction(context, ActionGame.threePoint),
                     displayValue: '+3',
                     fontSize: 40,
-                    color: selectedActionGame == ActionGame.threePoint ? AppColors.greenBtnSelected :  AppColors.greenBtn)),
+                    color: selectedActionGame == ActionGame.threePoint
+                        ? AppColors.greenBtnSelected
+                        : AppColors.greenBtn)),
           ],
         ),
         SizedBox(height: 15),
@@ -68,7 +72,9 @@ class ActionsSide extends StatelessWidget {
                       selectAction(context, ActionGame.failedFreeThrow),
                   displayValue: '1',
                   fontSize: 40,
-                  color: selectedActionGame == ActionGame.failedFreeThrow ? AppColors.redBtnSelected :  AppColors.redBtn,
+                  color: selectedActionGame == ActionGame.failedFreeThrow
+                      ? AppColors.redBtnSelected
+                      : AppColors.redBtn,
                   splashColor: Colors.redAccent,
                 )),
             Padding(
@@ -78,7 +84,9 @@ class ActionsSide extends StatelessWidget {
                         selectAction(context, ActionGame.failedTwoPoint),
                     displayValue: '2',
                     fontSize: 40,
-                    color: selectedActionGame == ActionGame.failedTwoPoint ? AppColors.redBtnSelected :  AppColors.redBtn,
+                    color: selectedActionGame == ActionGame.failedTwoPoint
+                        ? AppColors.redBtnSelected
+                        : AppColors.redBtn,
                     splashColor: Colors.redAccent)),
             Padding(
                 padding: EdgeInsets.only(left: 6),
@@ -87,7 +95,9 @@ class ActionsSide extends StatelessWidget {
                         selectAction(context, ActionGame.failedThreePoint),
                     displayValue: '3',
                     fontSize: 40,
-                    color: selectedActionGame == ActionGame.failedThreePoint ? AppColors.redBtnSelected :  AppColors.redBtn,
+                    color: selectedActionGame == ActionGame.failedThreePoint
+                        ? AppColors.redBtnSelected
+                        : AppColors.redBtn,
                     splashColor: Colors.redAccent)),
           ],
         ),
@@ -98,22 +108,28 @@ class ActionsSide extends StatelessWidget {
             Padding(
                 padding: EdgeInsets.only(right: 6),
                 child: ActionBtn(
-                    callback: () => selectAction(context, ActionGame.reboundOff),
-                    displayValue: 'Rebond off',
-                    color: selectedActionGame == ActionGame.reboundOff ? AppColors.greenBtnSelected :  AppColors.greenBtn,
+                  callback: () => selectAction(context, ActionGame.reboundOff),
+                  displayValue: 'Rebond off',
+                  color: selectedActionGame == ActionGame.reboundOff
+                      ? AppColors.greenBtnSelected
+                      : AppColors.greenBtn,
                 )),
             Padding(
                 padding: EdgeInsets.only(right: 6, left: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.block),
                     displayValue: 'contre',
-                    color: selectedActionGame == ActionGame.block ? AppColors.greenBtnSelected :  AppColors.greenBtn)),
+                    color: selectedActionGame == ActionGame.block
+                        ? AppColors.greenBtnSelected
+                        : AppColors.greenBtn)),
             Padding(
                 padding: EdgeInsets.only(left: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.fault),
                     displayValue: 'Faute',
-                    color: selectedActionGame == ActionGame.fault ? AppColors.redBtnSelected :  AppColors.redBtn,
+                    color: selectedActionGame == ActionGame.fault
+                        ? AppColors.redBtnSelected
+                        : AppColors.redBtn,
                     splashColor: Colors.redAccent)),
           ],
         ),
@@ -124,21 +140,29 @@ class ActionsSide extends StatelessWidget {
             Padding(
                 padding: EdgeInsets.only(right: 6),
                 child: ActionBtn(
-                    callback: () => selectAction(context, ActionGame.reboundDef),
+                    callback: () =>
+                        selectAction(context, ActionGame.reboundDef),
                     displayValue: 'Rebond def',
-                    color: selectedActionGame == ActionGame.reboundDef ? AppColors.greenBtnSelected :  AppColors.greenBtn)),
+                    color: selectedActionGame == ActionGame.reboundDef
+                        ? AppColors.greenBtnSelected
+                        : AppColors.greenBtn)),
             Padding(
                 padding: EdgeInsets.only(right: 6, left: 6),
                 child: ActionBtn(
-                    callback: () => selectAction(context, ActionGame.interception),
+                    callback: () =>
+                        selectAction(context, ActionGame.interception),
                     displayValue: 'Interception',
-                    color: selectedActionGame == ActionGame.interception ? AppColors.greenBtnSelected :  AppColors.greenBtn)),
+                    color: selectedActionGame == ActionGame.interception
+                        ? AppColors.greenBtnSelected
+                        : AppColors.greenBtn)),
             Padding(
                 padding: EdgeInsets.only(left: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.turnover),
                     displayValue: 'Perte de balle',
-                    color: selectedActionGame == ActionGame.turnover ? AppColors.redBtnSelected :  AppColors.redBtn,
+                    color: selectedActionGame == ActionGame.turnover
+                        ? AppColors.redBtnSelected
+                        : AppColors.redBtn,
                     splashColor: Colors.redAccent)),
           ],
         ),

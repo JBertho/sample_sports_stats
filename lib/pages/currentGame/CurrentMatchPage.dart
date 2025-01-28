@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:sample_sport_stats/AppColors.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameCubit.dart';
@@ -8,7 +9,6 @@ import 'package:sample_sport_stats/pages/currentGame/widget/ActionsSide.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/GameHeader.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/PlayersSide.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/TimerAndHistory.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/Game.dart';
 import 'model/ChronometerModel.dart';

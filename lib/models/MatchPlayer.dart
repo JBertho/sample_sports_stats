@@ -5,5 +5,10 @@ class MatchPlayer {
   int fault;
   bool onTheBench;
 
-  MatchPlayer({required this.name, required this.number, this.score = 0, this.fault = 0, this.onTheBench = false});
+  MatchPlayer(
+      {required this.name,
+      required this.number,
+      this.score = 0,
+      this.fault = 0,
+      this.onTheBench = false});
 }

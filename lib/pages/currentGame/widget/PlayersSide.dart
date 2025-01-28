@@ -14,7 +14,11 @@ class PlayerSide extends StatelessWidget {
   final List<MatchPlayer> teamPlayers;
   final MatchPlayer opponentPlayer;
 
-  const PlayerSide({super.key, required this.state, required this.teamPlayers, required this.opponentPlayer});
+  const PlayerSide(
+      {super.key,
+      required this.state,
+      required this.teamPlayers,
+      required this.opponentPlayer});
 
   @override
   Widget build(BuildContext context) {
@@ -23,55 +27,65 @@ class PlayerSide extends StatelessWidget {
       children: [
         Column(
           children: [
-            Text("Votre équipe", style: AppFontStyle.anton,),
+            Text(
+              "Votre équipe",
+              style: AppFontStyle.anton,
+            ),
             SizedBox(height: 10),
-            Expanded(child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: teamPlayers
-                    .map((player) =>
-                    Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: PlayerButton(
-                          color: state.selectedPlayer != player
-                              ? AppColors.yellowBtn
-                              : AppColors.yellowBtnSelected,
-                          splashColor: Colors.yellowAccent,
-                          playerName: player.name,
-                          playerNumber: player.number,
-                          callback: ()
-                          {
-                            var elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
-                            context
-                                .read<CurrentGameCubit>()
-                                .selectPlayer(player, elapsedTime);
-                          },
-
-                        )))
-                    .toList()),)
-
+            Expanded(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: teamPlayers
+                      .map((player) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: PlayerButton(
+                            color: state.selectedPlayer != player
+                                ? AppColors.yellowBtn
+                                : AppColors.yellowBtnSelected,
+                            splashColor: Colors.yellowAccent,
+                            playerName: player.name,
+                            playerNumber: player.number,
+                            callback: () {
+                              var elapsedTime = Provider.of<ChronometerModel>(
+                                      context,
+                                      listen: false)
+                                  .elapsedTime;
+                              context
+                                  .read<CurrentGameCubit>()
+                                  .selectPlayer(player, elapsedTime);
+                            },
+                          )))
+                      .toList()),
+            )
           ],
         ),
         Column(
           children: [
-            Text("Adversaire", style: AppFontStyle.anton,),
+            Text(
+              "Adversaire",
+              style: AppFontStyle.anton,
+            ),
             const SizedBox(height: 10),
             OpponentBtn(
                 callback: () {
-                  var  elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
+                  var elapsedTime =
+                      Provider.of<ChronometerModel>(context, listen: false)
+                          .elapsedTime;
                   context
                       .read<CurrentGameCubit>()
                       .selectOpponentPlayer(opponentPlayer, elapsedTime);
                 },
                 displayValue: opponentPlayer.name,
-                color: state.selectedOpponentPlayer != opponentPlayer ? AppColors.darkBlueBtn : AppColors.darkBlueBtnSelected,
+                color: state.selectedOpponentPlayer != opponentPlayer
+                    ? AppColors.darkBlueBtn
+                    : AppColors.darkBlueBtnSelected,
                 splashColor: Colors.blueAccent),
           ],
         )
       ],
     );
   }
-
 }
 
 class OpponentBtn extends StatelessWidget {
@@ -83,11 +97,11 @@ class OpponentBtn extends StatelessWidget {
 
   const OpponentBtn(
       {super.key,
-        required this.callback,
-        required this.displayValue,
-        required this.color,
-        required this.splashColor,
-        this.fontSize = 14});
+      required this.callback,
+      required this.displayValue,
+      required this.color,
+      required this.splashColor,
+      this.fontSize = 14});
 
   @override
   Widget build(BuildContext context) {
