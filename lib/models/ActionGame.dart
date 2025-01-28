@@ -5,7 +5,13 @@ enum ActionGame {
   fault(name: "Faute", type: ActionType.fault),
   failedTwoPoint(name: "3 pts raté ", type: ActionType.failedShot),
   failedThreePoint(name: "2 pts raté ", type: ActionType.failedShot),
-  failedFreeThrow(name: "Lancer franc raté ", type: ActionType.failedShot);
+  failedFreeThrow(name: "Lancer franc raté ", type: ActionType.failedShot),
+
+  reboundOff(name: "Rebond Off", type: ActionType.rebound),
+  reboundDef(name: "Rebond Def", type: ActionType.rebound),
+  turnover(name: "Perte de balle", type: ActionType.turnover),
+  interception(name: "Interception", type: ActionType.counter),
+  block(name: "Contre", type: ActionType.counter);
 
 
 
@@ -20,5 +26,8 @@ enum ActionType {
   point,
   fault,
   failedShot,
+  rebound,
+  turnover,
+  counter
 }
 

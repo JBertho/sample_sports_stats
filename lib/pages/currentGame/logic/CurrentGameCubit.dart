@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/History.dart';
@@ -44,6 +46,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
   }
 
   void saveAction(MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
+    log("SAVINNG");
     var currentState = state as CurrentGameInProgress;
 
     var histories = currentState.histories;
@@ -51,24 +54,26 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     var newHistories = List.of(histories);
     newHistories.add(history);
 
-    if (actionGame.type == ActionType.point) {
-      emit(CurrentGameInProgress(
-          teamScore: currentState.teamScore + actionGame.value,
-          opponentScore: currentState.opponentScore,
-          histories: newHistories));
+    switch(actionGame.type) {
+      case ActionType.point:
+        currentState.teamScore = currentState.teamScore + actionGame.value;
+        break;
+      case ActionType.fault:
+        //add fault
+        break;
+      case ActionType.failedShot:
+        //handle background stats
+      case ActionType.rebound:
+        //handle background stats
+      case ActionType.turnover:
+        //handle background stats
+      case ActionType.counter:
+        //handle background stats
     }
-    if (actionGame.type == ActionType.fault) {
-      emit(CurrentGameInProgress(
-          teamScore: currentState.teamScore,
-          opponentScore: currentState.opponentScore,
-          histories: newHistories));
-    }
-    if (actionGame.type == ActionType.failedShot) {
-      emit(CurrentGameInProgress(
-          teamScore: currentState.teamScore,
-          opponentScore: currentState.opponentScore,
-          histories: newHistories));
-    }
+    emit(CurrentGameInProgress(
+        teamScore: currentState.teamScore,
+        opponentScore: currentState.opponentScore,
+        histories: newHistories));
   }
 
   void deleteHistory(History history) {

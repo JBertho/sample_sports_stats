@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sample_sport_stats/AppColors.dart';
-import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameCubit.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameState.dart';
@@ -14,7 +11,6 @@ import 'package:sample_sport_stats/widgets/PlayerButton.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/Game.dart';
-import '../../widgets/ActionButton.dart';
 import 'model/ChronometerModel.dart';
 
 class CurrentMatchPage extends StatelessWidget {
@@ -99,7 +95,6 @@ class CurrentGame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var actions = ActionGame.values;
 
     return Row(children: [
       Expanded(
@@ -160,55 +155,8 @@ class CurrentGame extends StatelessWidget {
       ),
       Expanded(
           flex: 35,
-          child: ActionsSide())
+          child: ActionsSide(selectedActionGame: state.selectedAction,))
     ]);
-  }
-
-  List<Widget> _buildActionRows(List<ActionGame> actions, BuildContext context,
-      ActionGame? selectedActionGame) {
-    List<Widget> rows = [];
-
-    var firstColumn = actions.sublist(0, actions.length ~/ 2);
-    var lastColumn = actions.sublist(actions.length ~/ 2, actions.length);
-    rows.add(
-      Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: firstColumn.map((action) {
-          return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Actionbutton(
-                text: action.name,
-                color: selectedActionGame != action ? Colors.lime : Colors.pink,
-                callback: () {
-                  var  elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
-
-                  context.read<CurrentGameCubit>().selectActionGame(action, elapsedTime);
-                },
-              ));
-        }).toList(),
-      ),
-    );
-
-    rows.add(
-      Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: lastColumn.map((action) {
-          return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Actionbutton(
-                text: action.name,
-                color: selectedActionGame != action ? Colors.lime : Colors.pink,
-                callback: () {
-                  var  elapsedTime = Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
-
-                  context.read<CurrentGameCubit>().selectActionGame(action, elapsedTime);
-                },
-              ));
-        }).toList(),
-      ),
-    );
-
-    return rows;
   }
 }
 

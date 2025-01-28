@@ -8,4 +8,7 @@ class AppColors {
   static const Color orange = Color.fromARGB(255,246, 139, 31);
   static const Color white85 = Color.fromARGB(217, 255, 255, 255);
   static const Color greenBtn = Color.fromARGB(255, 60, 208, 112);
+  static const Color greenBtnSelected = Color.fromARGB(255, 19, 143, 62);
+  static const Color redBtn = Color.fromARGB(255, 216, 58, 52);
+  static const Color redBtnSelected = Color.fromARGB(255, 158, 32, 25);
 }
