@@ -7,7 +7,16 @@ class Game {
   int teamScore;
   int opponentScore;
   final List<MatchPlayer> teamPlayers;
+  final List<MatchPlayer> substitutes;
   final MatchPlayer opponentPlayer;
 
-  Game({required this.opponentName, this.rank = "TO_DEFINE", this.atHome = true, this.teamScore = 0, this.opponentScore = 0, required this.teamPlayers, required this.opponentPlayer});
+  Game(
+      {required this.opponentName,
+      this.rank = "TO_DEFINE",
+      this.atHome = true,
+      this.teamScore = 0,
+      this.opponentScore = 0,
+      required this.teamPlayers,
+      required this.substitutes,
+      required this.opponentPlayer});
 }

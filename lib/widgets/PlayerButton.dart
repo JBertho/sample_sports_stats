@@ -10,6 +10,8 @@ class PlayerButton extends StatelessWidget {
   final Function callback;
   final double fontSize;
   final int faultNumber;
+  final double width;
+  final double height;
 
   const PlayerButton({
     super.key,
@@ -19,7 +21,9 @@ class PlayerButton extends StatelessWidget {
     required this.callback,
     required this.splashColor,
     this.fontSize = 14,
-    required this.faultNumber
+    required this.faultNumber,
+    this.width = 150,
+    this.height = 45,
   });
 
   @override
@@ -39,12 +43,12 @@ class PlayerButton extends StatelessWidget {
           child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: SizedBox(
-                  width: 150,
-                  height: 45,
+                  width: width,
+                  height: height,
                   child: Row(
                     children: [
                       CircleAvatar(
-                        radius: 18,
+                        radius: height / 2.5,
                         child: Center(
                           child: Text("$playerNumber",
                               textAlign: TextAlign.center,

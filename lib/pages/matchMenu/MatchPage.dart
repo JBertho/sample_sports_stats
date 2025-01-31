@@ -41,6 +41,11 @@ class _MatchPage extends StatelessWidget {
               .map((player) =>
                   MatchPlayer(name: player.name, number: player.number))
               .toList(),
+          substitutes: state.teamPlayers
+          .where((player) => !player.selected)
+              .map((player) =>
+              MatchPlayer(name: player.name, number: player.number))
+              .toList(),
           opponentPlayer: MatchPlayer(name: state.opponentName, number: 0),
         );
         context.push(Routes.nestedCurrentMatchPage, extra: newGame);

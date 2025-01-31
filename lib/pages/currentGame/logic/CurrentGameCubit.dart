@@ -14,6 +14,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
             opponentScore: 0,
             opponent: MatchPlayer(name: "opponent", number: 0),
             teamPlayers: List.empty(),
+            substitutes: List.empty(),
             atHome: true));
 
   void initGame(Game game) {
@@ -23,13 +24,14 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         histories: List.empty(),
         opponent: MatchPlayer(name: game.opponentName, number: 0),
         teamPlayers: game.teamPlayers,
+        substitutes: game.substitutes,
         atHome: game.atHome));
   }
 
   void selectPlayer(MatchPlayer player, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
 
-    if (currentState.selectedAction == null) {
+    if (currentState.selectedAction == null && currentState.selectedSubPlayer == null) {
       emit(CurrentGameInProgress(
           selectedPlayer: player,
           teamScore: currentState.teamScore,
@@ -37,11 +39,33 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           opponentScore: currentState.opponentScore,
           histories: currentState.histories,
           teamPlayers: currentState.teamPlayers,
+          substitutes: currentState.substitutes,
           atHome: currentState.atHome));
-    } else {
+    } else if(currentState.selectedAction != null){
       saveAction(player, currentState.selectedAction!, elapsedTime);
+    } else if(currentState.selectedSubPlayer != null){
+      substitutePlayer(player, currentState.selectedSubPlayer!);
     }
   }
+
+  void selectSub(MatchPlayer player, Duration elapsedTime) {
+    var currentState = state as CurrentGameInProgress;
+
+    if (currentState.selectedPlayer == null) {
+      emit(CurrentGameInProgress(
+          selectedSubPlayer: player,
+          teamScore: currentState.teamScore,
+          opponent: currentState.opponent,
+          opponentScore: currentState.opponentScore,
+          histories: currentState.histories,
+          teamPlayers: currentState.teamPlayers,
+          substitutes: currentState.substitutes,
+          atHome: currentState.atHome));
+    } else {
+      substitutePlayer(currentState.selectedPlayer!, player);
+    }
+  }
+
 
   void selectActionGame(ActionGame actionGame, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
@@ -55,12 +79,32 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           opponent: currentState.opponent,
           histories: currentState.histories,
           teamPlayers: currentState.teamPlayers,
+          substitutes: currentState.substitutes,
           atHome: currentState.atHome));
     } else if (currentState.selectedOpponentPlayer != null) {
       saveAction(currentState.selectedOpponentPlayer!, actionGame, elapsedTime);
     } else {
       saveAction(currentState.selectedPlayer!, actionGame, elapsedTime);
     }
+  }
+
+  void substitutePlayer(MatchPlayer player, MatchPlayer substitute) {
+    var currentState = state as CurrentGameInProgress;
+
+    var subIndex = currentState.substitutes.indexOf(substitute);
+    currentState.substitutes[subIndex] = player;
+
+    var playerIndex = currentState.teamPlayers.indexOf(player);
+    currentState.teamPlayers[playerIndex] = substitute;
+
+    emit(CurrentGameInProgress(
+        teamScore: currentState.teamScore,
+        opponentScore: currentState.opponentScore,
+        opponent: currentState.opponent,
+        histories: currentState.histories,
+        teamPlayers: currentState.teamPlayers,
+        substitutes: currentState.substitutes,
+        atHome: currentState.atHome));
   }
 
   void saveAction(
@@ -104,6 +148,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         opponent: currentState.opponent,
         histories: newHistories,
         teamPlayers: currentState.teamPlayers,
+        substitutes: currentState.substitutes,
         atHome: currentState.atHome));
   }
 
@@ -148,6 +193,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           opponent: currentState.opponent,
           histories: histories,
           teamPlayers: currentState.teamPlayers,
+          substitutes: currentState.substitutes,
           atHome: currentState.atHome));
     }
   }

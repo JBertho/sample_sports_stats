@@ -9,6 +9,7 @@ abstract class CurrentGameState {
   final MatchPlayer opponent;
 
   final List<MatchPlayer> teamPlayers;
+  final List<MatchPlayer> substitutes;
   final List<History> histories;
 
   CurrentGameState(
@@ -17,6 +18,7 @@ abstract class CurrentGameState {
       required this.histories,
       required this.opponent,
       required this.teamPlayers,
+      required this.substitutes,
         required this.atHome
       });
 }
@@ -28,6 +30,7 @@ class CurrentGameInitial extends CurrentGameState {
       required super.teamScore,
       required super.opponentScore,
       required super.teamPlayers,
+      required super.substitutes,
       required super.atHome});
 }
 
@@ -35,15 +38,18 @@ class CurrentGameInProgress extends CurrentGameState {
   final MatchPlayer? selectedPlayer;
   final ActionGame? selectedAction;
   final MatchPlayer? selectedOpponentPlayer;
+  final MatchPlayer? selectedSubPlayer;
 
   CurrentGameInProgress(
       {this.selectedPlayer,
       this.selectedAction,
       this.selectedOpponentPlayer,
+        this.selectedSubPlayer,
       required super.teamScore,
       required super.opponentScore,
       required super.histories,
       required super.opponent,
       required super.teamPlayers,
+      required super.substitutes,
         required super.atHome});
 }

@@ -22,68 +22,113 @@ class PlayerSide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return Column(
       children: [
-        Column(
+        Flexible(flex: 60,child:  Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text(
-              "Votre équipe",
-              style: AppFontStyle.anton,
+            Column(
+              children: [
+                Text(
+                  "Votre équipe",
+                  style: AppFontStyle.anton,
+                ),
+                SizedBox(height: 10),
+                Expanded(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: teamPlayers
+                          .map((player) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: PlayerButton(
+                                color: state.selectedPlayer != player
+                                    ? AppColors.yellowBtn
+                                    : AppColors.yellowBtnSelected,
+                                splashColor: Colors.yellowAccent,
+                                playerName: player.name,
+                                playerNumber: player.number,
+                                callback: () {
+                                  var elapsedTime =
+                                      Provider.of<ChronometerModel>(context,
+                                              listen: false)
+                                          .elapsedTime;
+                                  context
+                                      .read<CurrentGameCubit>()
+                                      .selectPlayer(player, elapsedTime);
+                                },
+                                faultNumber: player.fault,
+                              )))
+                          .toList()),
+                )
+              ],
             ),
-            SizedBox(height: 10),
-            Expanded(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: teamPlayers
-                      .map((player) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: PlayerButton(
-                            color: state.selectedPlayer != player
-                                ? AppColors.yellowBtn
-                                : AppColors.yellowBtnSelected,
-                            splashColor: Colors.yellowAccent,
-                            playerName: player.name,
-                            playerNumber: player.number,
-                            callback: () {
-                              var elapsedTime = Provider.of<ChronometerModel>(
-                                      context,
-                                      listen: false)
-                                  .elapsedTime;
-                              context
-                                  .read<CurrentGameCubit>()
-                                  .selectPlayer(player, elapsedTime);
-                            },
-                            faultNumber: player.fault,
-                          )))
-                      .toList()),
+            Column(
+              children: [
+                Text(
+                  "Adversaire",
+                  style: AppFontStyle.anton,
+                ),
+                const SizedBox(height: 10),
+                OpponentBtn(
+                    callback: () {
+                      var elapsedTime =
+                          Provider.of<ChronometerModel>(context, listen: false)
+                              .elapsedTime;
+                      context
+                          .read<CurrentGameCubit>()
+                          .selectPlayer(opponentPlayer, elapsedTime);
+                    },
+                    displayValue: opponentPlayer.name,
+                    color: state.selectedPlayer != opponentPlayer
+                        ? AppColors.darkBlueBtn
+                        : AppColors.darkBlueBtnSelected,
+                    splashColor: Colors.blueAccent),
+              ],
             )
           ],
-        ),
-        Column(
+        ),),
+        const Divider(indent: 40, endIndent: 40,),
+        Flexible(flex: 30,child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              "Adversaire",
+              "Remplaçants",
               style: AppFontStyle.anton,
             ),
-            const SizedBox(height: 10),
-            OpponentBtn(
-                callback: () {
-                  var elapsedTime =
-                      Provider.of<ChronometerModel>(context, listen: false)
-                          .elapsedTime;
-                  context
-                      .read<CurrentGameCubit>()
-                      .selectPlayer(opponentPlayer, elapsedTime);
-                },
-                displayValue: opponentPlayer.name,
-                color: state.selectedPlayer != opponentPlayer
-                    ? AppColors.darkBlueBtn
-                    : AppColors.darkBlueBtnSelected,
-                splashColor: Colors.blueAccent),
+            Expanded(child:  GridView.count(
+              primary: false,
+              padding: const EdgeInsets.all(20),
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              crossAxisCount: 3,
+              childAspectRatio: 160/45,
+              children: state.substitutes.map((sub) {
+                return PlayerButton(
+                  color: state.selectedPlayer != sub
+                      ? AppColors.yellowBtn
+                      : AppColors.yellowBtnSelected,
+                  splashColor: Colors.yellowAccent,
+                  playerName: sub.name,
+                  playerNumber: sub.number,
+                  callback: () {
+                    var elapsedTime =
+                        Provider.of<ChronometerModel>(context,
+                            listen: false)
+                            .elapsedTime;
+                    context
+                        .read<CurrentGameCubit>()
+                        .selectSub(sub, elapsedTime);
+                  },
+                  faultNumber: sub.fault,
+                  fontSize: 10,
+                  height: 35,
+                );
+              }).toList(),
+            ))
           ],
-        )
+        ),)
       ],
     );
   }

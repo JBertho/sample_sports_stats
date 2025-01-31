@@ -65,7 +65,6 @@ class _CurrentMatchPage extends StatelessWidget {
                           opponentPlayer: state.opponent))
                 ]);
               }
-              //TODO
               return Container();
             }))));
   }
