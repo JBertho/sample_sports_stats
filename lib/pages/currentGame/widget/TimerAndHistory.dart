@@ -18,7 +18,9 @@ class TimerAndHistory extends StatelessWidget {
   final CurrentGameInProgress state;
 
   Widget buildHistoryString(History history) {
-    if (history.actionGame.type == ActionType.failedShot) {
+    if (history.actionGame.type == ActionType.failedShot
+        || history.actionGame.type == ActionType.turnover
+        || history.actionGame.type == ActionType.fault) {
       return RichText(
           text: TextSpan(
               style: AppFontStyle.anton.copyWith(color: Colors.black),
@@ -32,7 +34,9 @@ class TimerAndHistory extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold)),
           ]));
     }
-    if (history.actionGame.type == ActionType.point) {
+    if (history.actionGame.type == ActionType.point
+        || history.actionGame.type == ActionType.rebound
+        || history.actionGame.type == ActionType.counter) {
       return RichText(
           text: TextSpan(
               style: AppFontStyle.anton.copyWith(color: Colors.black),
@@ -40,20 +44,6 @@ class TimerAndHistory extends StatelessWidget {
             TextSpan(
                 text: history.actionGame.name,
                 style: const TextStyle(color: Colors.green)),
-            const TextSpan(text: " de "),
-            TextSpan(
-                text: history.player.name,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-          ]));
-    }
-    if (history.actionGame.type == ActionType.fault) {
-      return RichText(
-          text: TextSpan(
-              style: AppFontStyle.anton.copyWith(color: Colors.black),
-              children: [
-            TextSpan(
-                text: history.actionGame.name,
-                style: const TextStyle(color: Colors.red)),
             const TextSpan(text: " de "),
             TextSpan(
                 text: history.player.name,

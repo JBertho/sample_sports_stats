@@ -9,6 +9,7 @@ class PlayerButton extends StatelessWidget {
   final Color splashColor;
   final Function callback;
   final double fontSize;
+  final int faultNumber;
 
   const PlayerButton({
     super.key,
@@ -18,12 +19,13 @@ class PlayerButton extends StatelessWidget {
     required this.callback,
     required this.splashColor,
     this.fontSize = 14,
+    required this.faultNumber
   });
 
   @override
   Widget build(BuildContext context) {
     List<bool> faults = [false, false, false, false, false];
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < faultNumber; i++) {
       faults[i] = true;
     }
 

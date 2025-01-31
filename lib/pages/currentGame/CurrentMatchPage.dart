@@ -21,23 +21,19 @@ class CurrentMatchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<CurrentGameCubit>(
-      create: (_) => CurrentGameCubit()..initGame(),
-      child: _CurrentMatchPage(game: game),
+      create: (_) => CurrentGameCubit()..initGame(game),
+      child: const _CurrentMatchPage(),
     );
   }
 }
 
 class _CurrentMatchPage extends StatelessWidget {
-  final Game game;
 
-  const _CurrentMatchPage({required this.game});
+  const _CurrentMatchPage();
 
   @override
   Widget build(BuildContext context) {
     var name = "NOM D'EQUIPE";
-    var opponentName = game.opponentName;
-    var teamPlayers = game.teamPlayers;
-    var opponentsPlayer = game.opponentPlayer;
 
     return Scaffold(
         backgroundColor: AppColors.bg,
@@ -47,17 +43,17 @@ class _CurrentMatchPage extends StatelessWidget {
         ),
         body: ChangeNotifierProvider(
             create: (_) => ChronometerModel(),
-            // Fournir le modèle ChronometerModel
+
             child: SafeArea(child:
                 BlocBuilder<CurrentGameCubit, CurrentGameState>(
                     builder: (context, state) {
-              var atHomeValue = game.atHome ? 'à domicile' : 'à l\'exterieur';
+              var atHomeValue = state.atHome ? 'à domicile' : 'à l\'exterieur';
               if (state is CurrentGameInProgress) {
                 return Column(children: [
                   Padding(
                       padding: const EdgeInsets.only(top: 30),
                       child: GameHeader(
-                          opponentName: opponentName,
+                          opponentName: state.opponent.name,
                           atHomeValue: atHomeValue,
                           teamName: name,
                           teamScore: state.teamScore,
@@ -65,8 +61,8 @@ class _CurrentMatchPage extends StatelessWidget {
                   Expanded(
                       child: CurrentGame(
                           state: state,
-                          teamPlayers: teamPlayers,
-                          opponentPlayer: opponentsPlayer))
+                          teamPlayers: state.teamPlayers,
+                          opponentPlayer: state.opponent))
                 ]);
               }
               //TODO

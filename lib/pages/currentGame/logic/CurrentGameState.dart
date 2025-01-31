@@ -5,22 +5,30 @@ import 'package:sample_sport_stats/models/MatchPlayer.dart';
 abstract class CurrentGameState {
   int teamScore;
   int opponentScore;
+  final bool atHome;
+  final MatchPlayer opponent;
 
-  //final List<Player> teamPlayers;
-  //final List<Player> opponentPlayers;
+  final List<MatchPlayer> teamPlayers;
   final List<History> histories;
 
   CurrentGameState(
       {required this.teamScore,
       required this.opponentScore,
-      required this.histories});
+      required this.histories,
+      required this.opponent,
+      required this.teamPlayers,
+        required this.atHome
+      });
 }
 
 class CurrentGameInitial extends CurrentGameState {
   CurrentGameInitial(
       {required super.histories,
+      required super.opponent,
       required super.teamScore,
-      required super.opponentScore});
+      required super.opponentScore,
+      required super.teamPlayers,
+      required super.atHome});
 }
 
 class CurrentGameInProgress extends CurrentGameState {
@@ -34,5 +42,8 @@ class CurrentGameInProgress extends CurrentGameState {
       this.selectedOpponentPlayer,
       required super.teamScore,
       required super.opponentScore,
-      required super.histories});
+      required super.histories,
+      required super.opponent,
+      required super.teamPlayers,
+        required super.atHome});
 }

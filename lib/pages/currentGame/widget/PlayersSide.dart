@@ -55,6 +55,7 @@ class PlayerSide extends StatelessWidget {
                                   .read<CurrentGameCubit>()
                                   .selectPlayer(player, elapsedTime);
                             },
+                            faultNumber: player.fault,
                           )))
                       .toList()),
             )
@@ -74,10 +75,10 @@ class PlayerSide extends StatelessWidget {
                           .elapsedTime;
                   context
                       .read<CurrentGameCubit>()
-                      .selectOpponentPlayer(opponentPlayer, elapsedTime);
+                      .selectPlayer(opponentPlayer, elapsedTime);
                 },
                 displayValue: opponentPlayer.name,
-                color: state.selectedOpponentPlayer != opponentPlayer
+                color: state.selectedPlayer != opponentPlayer
                     ? AppColors.darkBlueBtn
                     : AppColors.darkBlueBtnSelected,
                 splashColor: Colors.blueAccent),

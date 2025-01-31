@@ -1,7 +1,6 @@
-import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
+import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/models/History.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
 
@@ -10,11 +9,21 @@ import 'CurrentGameState.dart';
 class CurrentGameCubit extends Cubit<CurrentGameState> {
   CurrentGameCubit()
       : super(CurrentGameInitial(
-            histories: List.empty(), teamScore: 0, opponentScore: 0));
+            histories: List.empty(),
+            teamScore: 0,
+            opponentScore: 0,
+            opponent: MatchPlayer(name: "opponent", number: 0),
+            teamPlayers: List.empty(),
+            atHome: true));
 
-  void initGame() {
+  void initGame(Game game) {
     emit(CurrentGameInProgress(
-        teamScore: 0, opponentScore: 0, histories: List.empty()));
+        teamScore: 0,
+        opponentScore: 0,
+        histories: List.empty(),
+        opponent: MatchPlayer(name: game.opponentName, number: 0),
+        teamPlayers: game.teamPlayers,
+        atHome: game.atHome));
   }
 
   void selectPlayer(MatchPlayer player, Duration elapsedTime) {
@@ -24,24 +33,13 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
       emit(CurrentGameInProgress(
           selectedPlayer: player,
           teamScore: currentState.teamScore,
+          opponent: currentState.opponent,
           opponentScore: currentState.opponentScore,
-          histories: currentState.histories));
+          histories: currentState.histories,
+          teamPlayers: currentState.teamPlayers,
+          atHome: currentState.atHome));
     } else {
       saveAction(player, currentState.selectedAction!, elapsedTime);
-    }
-  }
-
-  void selectOpponentPlayer(MatchPlayer opponent, Duration elapsedTime) {
-    var currentState = state as CurrentGameInProgress;
-
-    if (currentState.selectedAction == null) {
-      emit(CurrentGameInProgress(
-          selectedOpponentPlayer: opponent,
-          teamScore: currentState.teamScore,
-          opponentScore: currentState.opponentScore,
-          histories: currentState.histories));
-    } else {
-      saveOpponentAction(opponent, currentState.selectedAction!, elapsedTime);
     }
   }
 
@@ -54,48 +52,15 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           selectedAction: actionGame,
           teamScore: currentState.teamScore,
           opponentScore: currentState.opponentScore,
-          histories: currentState.histories));
+          opponent: currentState.opponent,
+          histories: currentState.histories,
+          teamPlayers: currentState.teamPlayers,
+          atHome: currentState.atHome));
     } else if (currentState.selectedOpponentPlayer != null) {
-      saveOpponentAction(
-          currentState.selectedOpponentPlayer!, actionGame, elapsedTime);
+      saveAction(currentState.selectedOpponentPlayer!, actionGame, elapsedTime);
     } else {
       saveAction(currentState.selectedPlayer!, actionGame, elapsedTime);
     }
-  }
-
-  void saveOpponentAction(
-      MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
-    //TODO : temporaire le temps de gérer l'équipe dans les states
-    log("SAVINNG OOPPPO");
-    var currentState = state as CurrentGameInProgress;
-
-    var histories = currentState.histories;
-    var history = History(
-        actionGame: actionGame, player: player, elapsedTime: elapsedTime);
-    var newHistories = List.of(histories);
-    newHistories.add(history);
-
-    switch (actionGame.type) {
-      case ActionType.point:
-        currentState.opponentScore =
-            currentState.opponentScore + actionGame.value;
-        break;
-      case ActionType.fault:
-        //add fault
-        break;
-      case ActionType.failedShot:
-      //handle background stats
-      case ActionType.rebound:
-      //handle background stats
-      case ActionType.turnover:
-      //handle background stats
-      case ActionType.counter:
-      //handle background stats
-    }
-    emit(CurrentGameInProgress(
-        teamScore: currentState.teamScore,
-        opponentScore: currentState.opponentScore,
-        histories: newHistories));
   }
 
   void saveAction(
@@ -110,10 +75,19 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
 
     switch (actionGame.type) {
       case ActionType.point:
-        currentState.teamScore = currentState.teamScore + actionGame.value;
+        if (player == state.opponent) {
+          currentState.opponentScore =
+              currentState.opponentScore + actionGame.value;
+          currentState.opponent.score =
+              currentState.opponent.score + actionGame.value;
+        } else {
+          currentState.teamScore = currentState.teamScore + actionGame.value;
+        }
         break;
       case ActionType.fault:
-        //add fault
+        if (history.player.fault < 5) {
+          player.fault += 1;
+        }
         break;
       case ActionType.failedShot:
       //handle background stats
@@ -127,7 +101,10 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     emit(CurrentGameInProgress(
         teamScore: currentState.teamScore,
         opponentScore: currentState.opponentScore,
-        histories: newHistories));
+        opponent: currentState.opponent,
+        histories: newHistories,
+        teamPlayers: currentState.teamPlayers,
+        atHome: currentState.atHome));
   }
 
   void deleteHistory(History history) {
@@ -136,12 +113,42 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
 
     var containHistory = histories.contains(history);
     if (containHistory) {
+      switch (history.actionGame.type) {
+        case ActionType.point:
+          if (history.player == currentState.opponent) {
+            currentState.opponentScore =
+                currentState.opponentScore - history.actionGame.value;
+            currentState.opponent.score =
+                currentState.opponent.score - history.actionGame.value;
+          } else {
+            currentState.teamScore =
+                currentState.teamScore - history.actionGame.value;
+          }
+          break;
+        case ActionType.fault:
+          if (history.player.fault > 0) {
+            history.player.fault -= 1;
+          }
+          break;
+        case ActionType.failedShot:
+        //handle background stats
+        case ActionType.rebound:
+        //handle background stats
+        case ActionType.turnover:
+        //handle background stats
+        case ActionType.counter:
+        //handle background stats
+      }
+
       histories.remove(history);
       emit(CurrentGameInProgress(
           selectedAction: currentState.selectedAction,
           teamScore: currentState.teamScore,
           opponentScore: currentState.opponentScore,
-          histories: histories));
+          opponent: currentState.opponent,
+          histories: histories,
+          teamPlayers: currentState.teamPlayers,
+          atHome: currentState.atHome));
     }
   }
 }
