@@ -6,6 +6,7 @@ import 'package:sample_sport_stats/models/MatchPlayer.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameCubit.dart';
 import 'package:sample_sport_stats/pages/currentGame/logic/CurrentGameState.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/ActionsSide.dart';
+import 'package:sample_sport_stats/pages/currentGame/widget/FinishGameDialog.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/GameHeader.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/PlayersSide.dart';
 import 'package:sample_sport_stats/pages/currentGame/widget/TimerAndHistory.dart';
@@ -31,6 +32,18 @@ class _CurrentMatchPage extends StatelessWidget {
 
   const _CurrentMatchPage();
 
+
+  showAlertDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext _) {
+        return FinishGameDialog(callback: () {
+          context.read<CurrentGameCubit>().finishGame();
+        },);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var name = "NOM D'EQUIPE";
@@ -45,7 +58,13 @@ class _CurrentMatchPage extends StatelessWidget {
             create: (_) => ChronometerModel(),
 
             child: SafeArea(child:
-                BlocBuilder<CurrentGameCubit, CurrentGameState>(
+
+                BlocListener<CurrentGameCubit, CurrentGameState>(listener: (listenerContext, state) {
+                  if(state is CurrentGameAskToFinish) {
+                    showAlertDialog(listenerContext);
+                  }
+
+                }, child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
                     builder: (context, state) {
               var atHomeValue = state.atHome ? 'à domicile' : 'à l\'exterieur';
               if (state is CurrentGameInProgress) {
@@ -66,7 +85,7 @@ class _CurrentMatchPage extends StatelessWidget {
                 ]);
               }
               return Container();
-            }))));
+            })))));
   }
 }
 

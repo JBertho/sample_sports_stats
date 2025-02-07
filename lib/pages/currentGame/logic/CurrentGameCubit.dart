@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
+import 'package:sample_sport_stats/infrastructure/DAO/game_dao.dart';
+import 'package:sample_sport_stats/infrastructure/Entities/game_entity.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/models/History.dart';
@@ -9,13 +13,13 @@ import 'CurrentGameState.dart';
 class CurrentGameCubit extends Cubit<CurrentGameState> {
   CurrentGameCubit()
       : super(CurrentGameInitial(
-            histories: List.empty(),
-            teamScore: 0,
-            opponentScore: 0,
-            opponent: MatchPlayer(name: "opponent", number: 0),
-            teamPlayers: List.empty(),
-            substitutes: List.empty(),
-            atHome: true));
+      histories: List.empty(),
+      teamScore: 0,
+      opponentScore: 0,
+      opponent: MatchPlayer(name: "opponent", number: 0),
+      teamPlayers: List.empty(),
+      substitutes: List.empty(),
+      atHome: true));
 
   void initGame(Game game) {
     emit(CurrentGameInProgress(
@@ -31,7 +35,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
   void selectPlayer(MatchPlayer player, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
 
-    if (currentState.selectedAction == null && currentState.selectedSubPlayer == null) {
+    if (currentState.selectedAction == null &&
+        currentState.selectedSubPlayer == null) {
       emit(CurrentGameInProgress(
           selectedPlayer: player,
           teamScore: currentState.teamScore,
@@ -41,9 +46,9 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           teamPlayers: currentState.teamPlayers,
           substitutes: currentState.substitutes,
           atHome: currentState.atHome));
-    } else if(currentState.selectedAction != null){
+    } else if (currentState.selectedAction != null) {
       saveAction(player, currentState.selectedAction!, elapsedTime);
-    } else if(currentState.selectedSubPlayer != null){
+    } else if (currentState.selectedSubPlayer != null) {
       substitutePlayer(player, currentState.selectedSubPlayer!);
     }
   }
@@ -65,7 +70,6 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
       substitutePlayer(currentState.selectedPlayer!, player);
     }
   }
-
 
   void selectActionGame(ActionGame actionGame, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
@@ -91,7 +95,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
   void substitutePlayer(MatchPlayer player, MatchPlayer substitute) {
     var currentState = state as CurrentGameInProgress;
 
-    if(!currentState.teamPlayers.contains(player)) {
+    if (!currentState.teamPlayers.contains(player)) {
       emit(CurrentGameInProgress(
           selectedSubPlayer: substitute,
           teamScore: currentState.teamScore,
@@ -120,8 +124,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         atHome: currentState.atHome));
   }
 
-  void saveAction(
-      MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
+  void saveAction(MatchPlayer player, ActionGame actionGame,
+      Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
 
     var histories = currentState.histories;
@@ -209,5 +213,30 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           substitutes: currentState.substitutes,
           atHome: currentState.atHome));
     }
+  }
+
+  void finishGameBtnPressed() {
+    emit(CurrentGameAskToFinish(opponentScore: state.opponentScore,
+        opponent: state.opponent,
+        histories: state.histories,
+        teamPlayers: state.teamPlayers,
+        substitutes: state.substitutes,
+        atHome: state.atHome,
+        teamScore: state.teamScore));
+  }
+
+  void finishGame() {
+    var gameDAO = GameDAO();
+    gameDAO.insertGame(GameEntity.fromModel(Game(
+        opponentName: state.opponent.name,
+        atHome: state.atHome,
+        teamScore: state.teamScore,
+        opponentScore: state.opponentScore,
+        substitutes: state.substitutes,
+        opponentPlayer: state.opponent, teamPlayers: state.teamPlayers)));
+
+    gameDAO.getGames().then((values) {
+      log("DEBUG DB $values");
+    });
   }
 }

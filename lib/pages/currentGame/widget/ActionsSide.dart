@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample_sport_stats/AppColors.dart';
@@ -18,7 +16,6 @@ class ActionsSide extends StatelessWidget {
     var elapsedTime =
         Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
 
-    log("SELECT ACTION : " + actionGame.name);
     context.read<CurrentGameCubit>().selectActionGame(actionGame, elapsedTime);
   }
 
@@ -26,7 +23,7 @@ class ActionsSide extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text("Tir réussi"),
+        Text("Tir réussi", style: AppFontStyle.anton),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -60,8 +57,8 @@ class ActionsSide extends StatelessWidget {
                         : AppColors.greenBtn)),
           ],
         ),
-        SizedBox(height: 15),
-        Text("Tir raté"),
+        const SizedBox(height: 15),
+        Text("Tir raté", style: AppFontStyle.anton),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -101,7 +98,7 @@ class ActionsSide extends StatelessWidget {
                     splashColor: Colors.redAccent)),
           ],
         ),
-        SizedBox(height: 40),
+        const SizedBox(height: 40),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -133,7 +130,7 @@ class ActionsSide extends StatelessWidget {
                     splashColor: Colors.redAccent)),
           ],
         ),
-        SizedBox(height: 15),
+        const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -166,6 +163,18 @@ class ActionsSide extends StatelessWidget {
                     splashColor: Colors.redAccent)),
           ],
         ),
+        const Spacer(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ParameterBtn(callback: () {}, displayValue: "Stats"),
+            const SizedBox(width: 15,),
+            ParameterBtn(callback: () {
+              context.read<CurrentGameCubit>().finishGameBtnPressed();
+            }, displayValue: "Fin du match"),
+          ],
+        ),
+        const SizedBox(height: 30)
       ],
     );
   }
@@ -198,6 +207,41 @@ class ActionBtn extends StatelessWidget {
           child: SizedBox(
             width: 70,
             height: 70,
+            child: Center(
+              child: Text(displayValue,
+                  textAlign: TextAlign.center,
+                  style: AppFontStyle.anton
+                      .copyWith(color: Colors.white, fontSize: fontSize)),
+            ),
+          ),
+        ));
+  }
+}
+
+class ParameterBtn extends StatelessWidget {
+  final Function callback;
+  final String displayValue;
+  final Color color = AppColors.orange;
+  final Color splashColor = Colors.orangeAccent;
+  final double fontSize  = 11;
+
+  const ParameterBtn(
+      {super.key,
+        required this.callback,
+        required this.displayValue});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+        color: color,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          splashColor: splashColor,
+          onTap: () => callback(),
+          child: SizedBox(
+            width: 105,
+            height: 45,
             child: Center(
               child: Text(displayValue,
                   textAlign: TextAlign.center,

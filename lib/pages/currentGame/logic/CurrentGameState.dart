@@ -53,3 +53,15 @@ class CurrentGameInProgress extends CurrentGameState {
       required super.substitutes,
         required super.atHome});
 }
+class CurrentGameAskToFinish extends CurrentGameInProgress {
+
+  CurrentGameAskToFinish(
+      {
+        required super.teamScore,
+        required super.opponentScore,
+        required super.histories,
+        required super.opponent,
+        required super.teamPlayers,
+        required super.substitutes,
+        required super.atHome});
+}
