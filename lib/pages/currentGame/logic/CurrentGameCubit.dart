@@ -91,6 +91,19 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
   void substitutePlayer(MatchPlayer player, MatchPlayer substitute) {
     var currentState = state as CurrentGameInProgress;
 
+    if(!currentState.teamPlayers.contains(player)) {
+      emit(CurrentGameInProgress(
+          selectedSubPlayer: substitute,
+          teamScore: currentState.teamScore,
+          opponentScore: currentState.opponentScore,
+          opponent: currentState.opponent,
+          histories: currentState.histories,
+          teamPlayers: currentState.teamPlayers,
+          substitutes: currentState.substitutes,
+          atHome: currentState.atHome));
+      return;
+    }
+
     var subIndex = currentState.substitutes.indexOf(substitute);
     currentState.substitutes[subIndex] = player;
 

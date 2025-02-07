@@ -106,7 +106,7 @@ class PlayerSide extends StatelessWidget {
               childAspectRatio: 160/45,
               children: state.substitutes.map((sub) {
                 return PlayerButton(
-                  color: state.selectedPlayer != sub
+                  color: state.selectedSubPlayer != sub
                       ? AppColors.yellowBtn
                       : AppColors.yellowBtnSelected,
                   splashColor: Colors.yellowAccent,
