@@ -11,6 +11,10 @@ class AppFontStyle {
       textStyle: const TextStyle(
           fontSize: 40, color: AppColors.blue));
 
+  static TextStyle teamHeader = GoogleFonts.anton(
+      textStyle: const TextStyle(
+          fontSize: 18, color: AppColors.blue, fontWeight: FontWeight.bold));
+
   static TextStyle scoreHeader = GoogleFonts.anton(
       textStyle: const TextStyle(
           fontSize: 32, color: AppColors.blue));

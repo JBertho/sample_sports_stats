@@ -15,4 +15,7 @@ class AppColors {
   static const Color yellowBtnSelected = Color.fromARGB(255, 186, 142, 4);
   static const Color darkBlueBtn = Color.fromARGB(255, 0, 95, 115);
   static const Color darkBlueBtnSelected = Color.fromARGB(255, 9, 77, 92);
+  static const Color orangeBackground = Color.fromARGB(31, 246, 139, 31);
+  static const Color fontGrey = Color.fromARGB(255, 155, 155, 155);
+
 }
