@@ -69,7 +69,7 @@ class _MatchPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(onPressed: () {
-                            context.push(Routes.teamsPage);
+                            context.pop();
                           }, icon: Icon(Icons.arrow_back_outlined)),
                           Text("Nouveau match ", style: AppFontStyle.header),
                           Visibility(visible: false, child: IconButton(onPressed: () {

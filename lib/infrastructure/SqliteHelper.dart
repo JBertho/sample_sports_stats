@@ -26,7 +26,9 @@ class SqliteHelper {
         await db.execute('''
           CREATE TABLE team (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT
+            name TEXT,
+            division TEXT,
+            season TEXT
           )
         ''');
         await db.execute('''

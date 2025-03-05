@@ -1,30 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sample_sport_stats/AppFontStyle.dart';
+import 'package:sample_sport_stats/infrastructure/DAO/team_dao.dart';
+import 'package:sample_sport_stats/models/Team.dart';
+import 'package:sample_sport_stats/pages/TeamsSelection/logic/TeamsSelectionCubit.dart';
+import 'package:sample_sport_stats/pages/TeamsSelection/logic/TeamsSelectionState.dart';
 
 import '../../AppColors.dart';
 import '../../router/routes.dart';
+import '../currentGame/widget/FinishGameDialog.dart';
 
 class TeamsSelectionPage extends StatelessWidget {
   const TeamsSelectionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return BlocProvider<TeamSelectionCubit>(
+      create: (_) => TeamSelectionCubit(TeamDao())..initTeamSelection(),
+      child: _TeamsSelectionPage(),
+    );
+  }
+}
+
+class _TeamsSelectionPage extends StatelessWidget {
+  _TeamsSelectionPage({super.key});
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController divisionController = TextEditingController();
+  final TextEditingController seasonController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
         backgroundColor: AppColors.grey,
         body: SafeArea(
-            child: Row(
-          children: [
-            Expanded(
-              flex: 45,
-              child: LeftSideTeamMenu(),
-            ),
-            Flexible(
-              flex: 55,
-              child: RightSideTeamMenu(),
-            )
-          ],
-        )));
+            child: BlocListener<TeamSelectionCubit, TeamsSelectionState>(
+                listener: (context, state) {
+                  if (state is TeamSelectionCreation) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext _) {
+                        return CreationDialog(
+                          nameController: nameController,
+                          divisionController: divisionController,
+                          seasonController: seasonController,
+                          callback: () {
+                            context.read<TeamSelectionCubit>().createTeam(Team(
+                                name: nameController.text,
+                                division: divisionController.text,
+                                season: seasonController.text));
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
+                child: const Row(
+                  children: [
+                    Expanded(
+                      flex: 45,
+                      child: LeftSideTeamMenu(),
+                    ),
+                    Flexible(
+                      flex: 55,
+                      child: RightSideTeamMenu(),
+                    )
+                  ],
+                ))));
   }
 }
 
@@ -35,54 +78,54 @@ class RightSideTeamMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String?> teams = ["Bulls", "Cavaliers", "Warriors", null];
-
-    return Center(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Row(
-          children: [
-            const Spacer(),
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.menu,
-                  size: 42,
-                )),
-            const SizedBox(width: 10)
-          ],
-        ),
-        const SizedBox(
-          height: 105,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 75),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Mes équipes",
-              style: AppFontStyle.header,
+    return BlocBuilder<TeamSelectionCubit, TeamsSelectionState>(
+        builder: (context, state) {
+      List<Team> teams = state.teams;
+      return Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Row(
+            children: [
+              const Spacer(),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.menu,
+                    size: 42,
+                  )),
+              const SizedBox(width: 10)
+            ],
+          ),
+          const SizedBox(
+            height: 105,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 75),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Mes équipes",
+                style: AppFontStyle.header,
+              ),
             ),
           ),
-        ),
-        Flexible(
-            child: GridView.count(
-          primary: false,
-          padding: const EdgeInsets.all(20),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 5,
-          crossAxisCount: 2,
-          childAspectRatio: 300 / 140,
-          children: teams.map((team) {
-            if (team != null) {
-              return TeamSelectionWidget(teamName: team);
-            }
-            return const NewTeamSelectionWidget();
-          }).toList(),
-        )),
-      ],
-    ));
+          Flexible(
+              child: GridView.count(
+            primary: false,
+            padding: const EdgeInsets.all(20),
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 5,
+            crossAxisCount: 2,
+            childAspectRatio: 300 / 140,
+            children: [
+              ...teams.map((team) => TeamSelectionWidget(team: team)),
+              if (teams.length < 4) const NewTeamSelectionWidget()
+            ],
+          )),
+        ],
+      ));
+    });
   }
 }
 
@@ -128,9 +171,9 @@ class LeftSideTeamMenu extends StatelessWidget {
 }
 
 class TeamSelectionWidget extends StatelessWidget {
-  final String teamName;
+  final Team team;
 
-  const TeamSelectionWidget({super.key, required this.teamName});
+  const TeamSelectionWidget({super.key, required this.team});
 
   @override
   Widget build(BuildContext context) {
@@ -158,14 +201,14 @@ class TeamSelectionWidget extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(teamName, style: AppFontStyle.teamHeader),
+                            Text(team.name, style: AppFontStyle.teamHeader),
                             const SizedBox(height: 15),
                             Row(
                               children: [
                                 const Icon(Icons.star),
                                 const SizedBox(width: 15),
                                 Text(
-                                  "Régional Div 3",
+                                  team.season,
                                   style: AppFontStyle.anton,
                                 )
                               ],
@@ -176,7 +219,7 @@ class TeamSelectionWidget extends StatelessWidget {
                                 const Icon(Icons.calendar_month_outlined),
                                 const SizedBox(width: 15),
                                 Text(
-                                  "2024-2025",
+                                  team.division,
                                   style: AppFontStyle.anton,
                                 )
                               ],
@@ -204,7 +247,7 @@ class NewTeamSelectionWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               splashColor: AppColors.orange,
               onTap: () {
-                context.push(Routes.matchPage);
+                context.read<TeamSelectionCubit>().creationTeamPressed();
               },
               child: Container(
                 width: double.infinity,
@@ -227,5 +270,83 @@ class NewTeamSelectionWidget extends StatelessWidget {
                 ),
               ),
             )));
+  }
+}
+
+class CreationDialog extends StatelessWidget {
+  final Function callback;
+  final TextEditingController nameController;
+  final TextEditingController divisionController;
+  final TextEditingController seasonController;
+
+  CreationDialog(
+      {super.key,
+      required this.callback,
+      required this.nameController,
+      required this.divisionController,
+      required this.seasonController});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget okButton = DialogBtn(
+        callback: () {
+          callback();
+          Navigator.of(context).pop();
+        },
+        displayValue: "Valider");
+    Widget cancelButton = DialogBtn(
+      callback: () {
+        Navigator.of(context).pop();
+      },
+      displayValue: "Annuler",
+      color: Colors.red,
+      splashColor: Colors.redAccent,
+    );
+
+    return AlertDialog(
+      title: Text("Création d'équipe", style: AppFontStyle.anton),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            decoration: InputDecoration(
+                fillColor: AppColors.grey,
+                filled: true,
+                border: OutlineInputBorder(),
+                hintText: "Nom de l'équipe",
+                helperStyle: AppFontStyle.anton),
+            controller: nameController,
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          TextField(
+            decoration: InputDecoration(
+                fillColor: AppColors.grey,
+                filled: true,
+                border: OutlineInputBorder(),
+                hintText: "Division",
+                helperStyle: AppFontStyle.anton),
+            controller: divisionController,
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          TextField(
+            decoration: InputDecoration(
+                fillColor: AppColors.grey,
+                filled: true,
+                border: OutlineInputBorder(),
+                hintText: "Saison",
+                helperStyle: AppFontStyle.anton),
+            controller: seasonController,
+          ),
+        ],
+      ),
+      actions: [
+        cancelButton,
+        okButton,
+      ],
+    );
   }
 }
