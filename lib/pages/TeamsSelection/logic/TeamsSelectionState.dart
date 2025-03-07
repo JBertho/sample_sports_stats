@@ -14,6 +14,12 @@ class TeamsSelectionView extends TeamsSelectionState {
   TeamsSelectionView({required super.teams});
 }
 
-class TeamSelectionCreation extends TeamsSelectionState {
+class TeamSelectionCreation extends TeamsSelectionState  {
   TeamSelectionCreation({required super.teams});
+}
+
+class SelectedTeamState extends TeamsSelectionView {
+  final Team team;
+
+  SelectedTeamState({required super.teams, required this.team});
 }

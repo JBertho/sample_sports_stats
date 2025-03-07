@@ -16,6 +16,13 @@ class GameDAO {
       return GameEntity.fromMap(maps[i]);
     });
   }
+  Future<List<GameEntity>> getGamesByTeamId(int id) async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query('game', where: 'team_id = ?', whereArgs: [id]);
+    return List.generate(maps.length, (i) {
+      return GameEntity.fromMap(maps[i]);
+    });
+  }
 
   Future<void> updateGame(GameEntity game) async {
     final db = await dbHelper.database;

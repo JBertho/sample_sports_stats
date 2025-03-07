@@ -1,8 +1,10 @@
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/History.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
+import 'package:sample_sport_stats/models/Team.dart';
 
 abstract class CurrentGameState {
+  final Team team;
   int teamScore;
   int opponentScore;
   final bool atHome;
@@ -19,8 +21,8 @@ abstract class CurrentGameState {
       required this.opponent,
       required this.teamPlayers,
       required this.substitutes,
-        required this.atHome
-      });
+      required this.atHome,
+      required this.team});
 }
 
 class CurrentGameInitial extends CurrentGameState {
@@ -31,7 +33,8 @@ class CurrentGameInitial extends CurrentGameState {
       required super.opponentScore,
       required super.teamPlayers,
       required super.substitutes,
-      required super.atHome});
+      required super.atHome,
+      required super.team});
 }
 
 class CurrentGameInProgress extends CurrentGameState {
@@ -44,24 +47,25 @@ class CurrentGameInProgress extends CurrentGameState {
       {this.selectedPlayer,
       this.selectedAction,
       this.selectedOpponentPlayer,
-        this.selectedSubPlayer,
+      this.selectedSubPlayer,
       required super.teamScore,
       required super.opponentScore,
       required super.histories,
       required super.opponent,
       required super.teamPlayers,
       required super.substitutes,
-        required super.atHome});
+      required super.atHome,
+      required super.team});
 }
-class CurrentGameAskToFinish extends CurrentGameInProgress {
 
+class CurrentGameAskToFinish extends CurrentGameInProgress {
   CurrentGameAskToFinish(
-      {
-        required super.teamScore,
-        required super.opponentScore,
-        required super.histories,
-        required super.opponent,
-        required super.teamPlayers,
-        required super.substitutes,
-        required super.atHome});
+      {required super.teamScore,
+      required super.opponentScore,
+      required super.histories,
+      required super.opponent,
+      required super.teamPlayers,
+      required super.substitutes,
+      required super.atHome,
+      required super.team});
 }

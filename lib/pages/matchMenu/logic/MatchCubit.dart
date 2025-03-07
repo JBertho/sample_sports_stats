@@ -1,10 +1,12 @@
 import 'package:bloc/bloc.dart';
+import 'package:sample_sport_stats/models/Team.dart';
 import 'package:sample_sport_stats/pages/matchMenu/logic/MatchState.dart';
 
 import '../../../models/Player.dart';
 
 class MatchCubit extends Cubit<MatchState> {
-  MatchCubit(): super(MatchStateInitial(teamPlayers: List.empty(), atHome: true));
+  MatchCubit(): super(MatchStateInitial(team: Team(name: "", division: "", season: ""), teamPlayers: List.empty(), atHome: true));
+
 
   final List<Player> teamPlayers = [
     Player(name: "Jamso", number: 1),
@@ -19,8 +21,8 @@ class MatchCubit extends Cubit<MatchState> {
     Player(name: "Charles", number: 18),
   ];
 
-  void initGame() {
-    emit(MatchStateInProgress(teamPlayers: teamPlayers, atHome: true));
+  void initGame(Team team) {
+    emit(MatchStateInProgress(team: team, teamPlayers: teamPlayers, atHome: true));
   }
 
   void selectPlayer(Player player) {
@@ -28,7 +30,7 @@ class MatchCubit extends Cubit<MatchState> {
 
     if(contains) {
       teamPlayers.firstWhere((pl) => pl.name == player.name && pl.number == player.number).selected = true;
-      emit(MatchStateInProgress(teamPlayers: teamPlayers, atHome: state.atHome));
+      emit(MatchStateInProgress(team: state.team, teamPlayers: teamPlayers, atHome: state.atHome));
     }
   }
 
@@ -37,17 +39,17 @@ class MatchCubit extends Cubit<MatchState> {
     if(contains) {
       teamPlayers.firstWhere((pl) => pl.name == player.name && pl.number == player.number).selected = false;
     }
-    emit(MatchStateInProgress(teamPlayers: teamPlayers, atHome: state.atHome));
+    emit(MatchStateInProgress(team: state.team, teamPlayers: teamPlayers, atHome: state.atHome));
   }
 
   void updateAtHome() {
-    emit(MatchStateInProgress(teamPlayers: state.teamPlayers, atHome: !state.atHome));
+    emit(MatchStateInProgress(team: state.team, teamPlayers: state.teamPlayers, atHome: !state.atHome));
 
   }
 
   void beginMatch(String opponentName) {
     var selectedList = state.teamPlayers.where((player) => player.selected).toList();
-    emit(BeginMatchState(teamPlayers: state.teamPlayers, atHome: state.atHome, opponentName: opponentName, selectedPlayers: selectedList));
-    emit(MatchStateInProgress(teamPlayers: state.teamPlayers, atHome: state.atHome));
+    emit(BeginMatchState(team: state.team, teamPlayers: state.teamPlayers, atHome: state.atHome, opponentName: opponentName, selectedPlayers: selectedList));
+    emit(MatchStateInProgress(team: state.team, teamPlayers: state.teamPlayers, atHome: state.atHome));
   }
 }

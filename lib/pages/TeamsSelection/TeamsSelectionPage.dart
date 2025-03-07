@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sample_sport_stats/AppFontStyle.dart';
-import 'package:sample_sport_stats/infrastructure/DAO/team_dao.dart';
 import 'package:sample_sport_stats/models/Team.dart';
 import 'package:sample_sport_stats/pages/TeamsSelection/logic/TeamsSelectionCubit.dart';
 import 'package:sample_sport_stats/pages/TeamsSelection/logic/TeamsSelectionState.dart';
@@ -16,15 +15,12 @@ class TeamsSelectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<TeamSelectionCubit>(
-      create: (_) => TeamSelectionCubit(TeamDao())..initTeamSelection(),
-      child: _TeamsSelectionPage(),
-    );
+    return _TeamsSelectionPage();
   }
 }
 
 class _TeamsSelectionPage extends StatelessWidget {
-  _TeamsSelectionPage({super.key});
+  _TeamsSelectionPage();
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController divisionController = TextEditingController();
@@ -188,8 +184,9 @@ class TeamSelectionWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 splashColor: AppColors.orange,
                 onTap: () {
-                  context.push(Routes.matchPage);
-                }, // Utilise la fonction passée en paramètre
+                  context.read<TeamSelectionCubit>().selectTeam(team);
+                  context.push(Routes.matchPage, extra: team);
+                },
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(

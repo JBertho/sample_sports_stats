@@ -40,4 +40,16 @@ class TeamSelectionCubit extends Cubit<TeamsSelectionState> {
     state.teams.add(createdTeam);
     emit(TeamsSelectionView(teams: state.teams));
   }
+
+  void selectTeam(Team team) {
+    emit(SelectedTeamState(teams: state.teams, team: team));
+  }
+
+  Team? getTeam() {
+    if(state is SelectedTeamState) {
+       var currentState = state as SelectedTeamState;
+      return currentState.team;
+    }
+    return null;
+  }
 }

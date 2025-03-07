@@ -29,25 +29,23 @@ class CurrentMatchPage extends StatelessWidget {
 }
 
 class _CurrentMatchPage extends StatelessWidget {
-
   const _CurrentMatchPage();
-
 
   showAlertDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext _) {
-        return FinishGameDialog(callback: () {
-          context.read<CurrentGameCubit>().finishGame();
-        },);
+        return FinishGameDialog(
+          callback: () {
+            context.read<CurrentGameCubit>().finishGame();
+          },
+        );
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    var name = "NOM D'EQUIPE";
-
     return Scaffold(
         backgroundColor: AppColors.bg,
         appBar: AppBar(
@@ -56,16 +54,14 @@ class _CurrentMatchPage extends StatelessWidget {
         ),
         body: ChangeNotifierProvider(
             create: (_) => ChronometerModel(),
-
-            child: SafeArea(child:
-
-                BlocListener<CurrentGameCubit, CurrentGameState>(listener: (listenerContext, state) {
-                  if(state is CurrentGameAskToFinish) {
-                    showAlertDialog(listenerContext);
-                  }
-
-                }, child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
-                    builder: (context, state) {
+            child: SafeArea(
+                child: BlocListener<CurrentGameCubit, CurrentGameState>(
+                    listener: (listenerContext, state) {
+              if (state is CurrentGameAskToFinish) {
+                showAlertDialog(listenerContext);
+              }
+            }, child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
+                        builder: (context, state) {
               var atHomeValue = state.atHome ? 'à domicile' : 'à l\'exterieur';
               if (state is CurrentGameInProgress) {
                 return Column(children: [
@@ -74,7 +70,7 @@ class _CurrentMatchPage extends StatelessWidget {
                       child: GameHeader(
                           opponentName: state.opponent.name,
                           atHomeValue: atHomeValue,
-                          teamName: name,
+                          teamName: state.team.name,
                           teamScore: state.teamScore,
                           opponentScore: state.opponentScore)),
                   Expanded(

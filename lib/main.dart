@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sample_sport_stats/pages/TeamsSelection/logic/TeamsSelectionCubit.dart';
+import 'package:sample_sport_stats/pages/history/logic/HistoryCubit.dart';
 import 'package:sample_sport_stats/router/router.dart';
+
+import 'infrastructure/DAO/game_dao.dart';
+import 'infrastructure/DAO/team_dao.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,14 +22,20 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    return MaterialApp.router(
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-    );
+    return BlocProvider<TeamSelectionCubit>(
+        create: (_) => TeamSelectionCubit(TeamDao())..initTeamSelection(),
+        child: BlocProvider<HistoryCubit>(
+            create: (_) {
+              return HistoryCubit(gameDAO: GameDAO());
+            },
+            child: MaterialApp.router(
+              routerConfig: router,
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+                useMaterial3: true,
+              ),
+            )));
   }
 }
 

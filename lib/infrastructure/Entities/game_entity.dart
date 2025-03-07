@@ -19,7 +19,7 @@ class GameEntity {
   Map<String, Object?> toMap() {
     return {
       'id': id,
-      'opponent_name': opponentScore,
+      'opponent_name': opponentName,
       'team_score': teamScore,
       'opponent_score': opponentScore,
       'at_home': atHome ? 1 : 0,
@@ -31,8 +31,8 @@ class GameEntity {
     return GameEntity(
         id: map['id'],
         opponentName: map['opponent_name'],
-        opponentScore: map['team_score'],
-        teamScore: map['opponent_score'],
+        opponentScore: map['opponent_score'],
+        teamScore: map['team_score'],
         atHome: map['at_home'] == 1,
         teamId: map['team_id']);
   }
@@ -43,6 +43,6 @@ class GameEntity {
         opponentScore: game.opponentScore,
         teamScore: game.teamScore,
         atHome: game.atHome,
-        teamId: 5);
+        teamId: game.team.id!);
   }
 }

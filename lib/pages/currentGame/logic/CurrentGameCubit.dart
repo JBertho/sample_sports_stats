@@ -7,22 +7,25 @@ import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/models/History.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
+import 'package:sample_sport_stats/models/Team.dart';
 
 import 'CurrentGameState.dart';
 
 class CurrentGameCubit extends Cubit<CurrentGameState> {
   CurrentGameCubit()
       : super(CurrentGameInitial(
-      histories: List.empty(),
-      teamScore: 0,
-      opponentScore: 0,
-      opponent: MatchPlayer(name: "opponent", number: 0),
-      teamPlayers: List.empty(),
-      substitutes: List.empty(),
-      atHome: true));
+            histories: List.empty(),
+            teamScore: 0,
+            opponentScore: 0,
+            opponent: MatchPlayer(name: "opponent", number: 0),
+            teamPlayers: List.empty(),
+            substitutes: List.empty(),
+            atHome: true,
+            team: Team(name: "", division: "", season: "")));
 
   void initGame(Game game) {
     emit(CurrentGameInProgress(
+        team: game.team,
         teamScore: 0,
         opponentScore: 0,
         histories: List.empty(),
@@ -38,6 +41,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     if (currentState.selectedAction == null &&
         currentState.selectedSubPlayer == null) {
       emit(CurrentGameInProgress(
+          team: currentState.team,
           selectedPlayer: player,
           teamScore: currentState.teamScore,
           opponent: currentState.opponent,
@@ -58,6 +62,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
 
     if (currentState.selectedPlayer == null) {
       emit(CurrentGameInProgress(
+          team: currentState.team,
           selectedSubPlayer: player,
           teamScore: currentState.teamScore,
           opponent: currentState.opponent,
@@ -77,6 +82,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     if (currentState.selectedPlayer == null &&
         currentState.selectedOpponentPlayer == null) {
       emit(CurrentGameInProgress(
+          team: currentState.team,
           selectedAction: actionGame,
           teamScore: currentState.teamScore,
           opponentScore: currentState.opponentScore,
@@ -97,6 +103,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
 
     if (!currentState.teamPlayers.contains(player)) {
       emit(CurrentGameInProgress(
+          team: currentState.team,
           selectedSubPlayer: substitute,
           teamScore: currentState.teamScore,
           opponentScore: currentState.opponentScore,
@@ -115,6 +122,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     currentState.teamPlayers[playerIndex] = substitute;
 
     emit(CurrentGameInProgress(
+        team: currentState.team,
         teamScore: currentState.teamScore,
         opponentScore: currentState.opponentScore,
         opponent: currentState.opponent,
@@ -124,8 +132,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         atHome: currentState.atHome));
   }
 
-  void saveAction(MatchPlayer player, ActionGame actionGame,
-      Duration elapsedTime) {
+  void saveAction(
+      MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
     var currentState = state as CurrentGameInProgress;
 
     var histories = currentState.histories;
@@ -160,6 +168,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
       //handle background stats
     }
     emit(CurrentGameInProgress(
+        team: currentState.team,
         teamScore: currentState.teamScore,
         opponentScore: currentState.opponentScore,
         opponent: currentState.opponent,
@@ -204,6 +213,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
 
       histories.remove(history);
       emit(CurrentGameInProgress(
+          team: currentState.team,
           selectedAction: currentState.selectedAction,
           teamScore: currentState.teamScore,
           opponentScore: currentState.opponentScore,
@@ -216,7 +226,9 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
   }
 
   void finishGameBtnPressed() {
-    emit(CurrentGameAskToFinish(opponentScore: state.opponentScore,
+    emit(CurrentGameAskToFinish(
+        team: state.team,
+        opponentScore: state.opponentScore,
         opponent: state.opponent,
         histories: state.histories,
         teamPlayers: state.teamPlayers,
@@ -227,13 +239,16 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
 
   void finishGame() {
     var gameDAO = GameDAO();
+    log("SAUVEGARDE : ${state.opponent.name}");
     gameDAO.insertGame(GameEntity.fromModel(Game(
+        team: state.team,
         opponentName: state.opponent.name,
         atHome: state.atHome,
         teamScore: state.teamScore,
         opponentScore: state.opponentScore,
         substitutes: state.substitutes,
-        opponentPlayer: state.opponent, teamPlayers: state.teamPlayers)));
+        opponentPlayer: state.opponent,
+        teamPlayers: state.teamPlayers)));
 
     gameDAO.getGames().then((values) {
       log("DEBUG DB $values");

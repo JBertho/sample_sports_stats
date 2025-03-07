@@ -10,15 +10,19 @@ import 'package:sample_sport_stats/pages/matchMenu/logic/MatchCubit.dart';
 import 'package:sample_sport_stats/pages/matchMenu/logic/MatchState.dart';
 
 import '../../AppColors.dart';
+import '../../models/Team.dart';
 import '../../router/routes.dart';
 
 class MatchPage extends StatelessWidget {
-  const MatchPage({super.key});
+
+  final Team team;
+
+  const MatchPage({super.key, required this.team});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<MatchCubit>(
-      create: (_) => MatchCubit()..initGame(),
+      create: (_) => MatchCubit()..initGame(team),
       child: _MatchPage(),
     );
   }
@@ -35,6 +39,7 @@ class _MatchPage extends StatelessWidget {
                 listener: (context, state) {
       if (state is BeginMatchState) {
         var newGame = Game(
+          team: state.team,
           opponentName: state.opponentName,
           atHome: state.atHome,
           teamPlayers: state.selectedPlayers
@@ -71,7 +76,10 @@ class _MatchPage extends StatelessWidget {
                           IconButton(onPressed: () {
                             context.pop();
                           }, icon: Icon(Icons.arrow_back_outlined)),
-                          Text("Nouveau match ", style: AppFontStyle.header),
+                          Column(
+                            children: [
+                              Text(state.team.name, style: AppFontStyle.blue34),
+                            ]),
                           Visibility(visible: false, child: IconButton(onPressed: () {
                             context.push(Routes.teamsPage);
                           }, icon: Icon(Icons.arrow_back_outlined)))
