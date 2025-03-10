@@ -11,7 +11,7 @@ class AppColors {
   static const Color greenBtnSelected = Color.fromARGB(255, 19, 143, 62);
   static const Color redBtn = Color.fromARGB(255, 216, 58, 52);
   static const Color redBtnSelected = Color.fromARGB(255, 158, 32, 25);
-  static const Color yellowBtn = Color.fromARGB(255, 255, 193, 7);
+  static const Color yellow = Color.fromARGB(255, 255, 193, 7);
   static const Color yellowBtnSelected = Color.fromARGB(255, 186, 142, 4);
   static const Color darkBlueBtn = Color.fromARGB(255, 0, 95, 115);
   static const Color darkBlueBtnSelected = Color.fromARGB(255, 9, 77, 92);

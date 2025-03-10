@@ -43,7 +43,7 @@ class PlayerSide extends StatelessWidget {
                               padding: const EdgeInsets.only(bottom: 10),
                               child: PlayerButton(
                                 color: state.selectedPlayer != player
-                                    ? AppColors.yellowBtn
+                                    ? AppColors.yellow
                                     : AppColors.yellowBtnSelected,
                                 splashColor: Colors.yellowAccent,
                                 playerName: player.name,
@@ -107,7 +107,7 @@ class PlayerSide extends StatelessWidget {
               children: state.substitutes.map((sub) {
                 return PlayerButton(
                   color: state.selectedSubPlayer != sub
-                      ? AppColors.yellowBtn
+                      ? AppColors.yellow
                       : AppColors.yellowBtnSelected,
                   splashColor: Colors.yellowAccent,
                   playerName: sub.name,
