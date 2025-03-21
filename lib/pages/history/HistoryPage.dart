@@ -19,15 +19,16 @@ class _HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: AppColors.grey,
         body: SafeArea(child: BlocBuilder<HistoryCubit, HistoryState>(
-      builder: (context, state) {
-        if (state is HistoryTeamState) {
-          return Hystories(state: state);
-        }
+          builder: (context, state) {
+            if (state is HistoryTeamState) {
+              return Hystories(state: state);
+            }
 
-        return Text("Liste vide");
-      },
-    )));
+            return Text("Liste vide");
+          },
+        )));
   }
 }
 
@@ -49,13 +50,17 @@ class Hystories extends StatelessWidget {
                 child: Text("Matchs joués", style: AppFontStyle.header))),
         const Divider(),
         Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  var game = state.games[index];
-                  return HistoryWidget(game: game);
-                },
-                separatorBuilder: (_, idx) => const Divider(),
-                itemCount: state.games.length))
+            child: Center(
+                child: SizedBox(
+                    width: MediaQuery.of(context).size.width *
+                        0.7, // 70% de la largeur de l'écran
+                    child: ListView.separated(
+                        itemBuilder: (context, index) {
+                          var game = state.games[index];
+                          return HistoryWidget(game: game);
+                        },
+                        separatorBuilder: (_, idx) => Container(),
+                        itemCount: state.games.length))))
       ],
     );
   }
@@ -71,35 +76,47 @@ class HistoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
+    return Padding(
+        padding: const EdgeInsets.only(top: 5, bottom: 5),
+        child: Container(
+            height: 40,
+            width: 400,
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                color: Colors.white),
             child: Row(
-          children: [
-            const SizedBox(
-              width: 150,
-              child: Text("18 Oct. 2024"),
-            ),
-            const Spacer(),
-            Text(game.team.name),
-          ],
-        )),
-        ScoreWidget(
-            teamScore: game.teamScore, opponentScore: game.opponentScore),
-        Expanded(
-            child: Row(
-          children: [
-            Text(game.opponentName),
-            const Spacer(),
-            const SizedBox(
-              width: 150,
-              child: Icon(Icons.arrow_forward_sharp),
-            )
-          ],
-        ))
-      ],
-    );
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                    child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 150,
+                      child: Text("18 Oct. 2024"),
+                    ),
+                    Text(game.team.name),
+                    const SizedBox(
+                      width: 30,
+                    )
+                  ],
+                )),
+                ScoreWidget(
+                    teamScore: game.teamScore,
+                    opponentScore: game.opponentScore),
+                Expanded(
+                    child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 30,
+                    ),
+                    Text(game.opponentName),
+                    const SizedBox(
+                      child: Icon(Icons.arrow_forward_sharp),
+                    )
+                  ],
+                ))
+              ],
+            )));
   }
 }
 
@@ -112,24 +129,26 @@ class ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(5)),
-          border: Border.all(color: AppColors.yellow)),
-      child: Row(
-        children: [
-          Container(
-            width: 30,
-            color: teamScore > opponentScore ? AppColors.yellow : null,
-            child: Center(child: Text("$teamScore")),
+    return Padding(
+        padding: EdgeInsets.symmetric(vertical: 5),
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              border: Border.all(color: AppColors.yellow)),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                color: teamScore > opponentScore ? AppColors.yellow : null,
+                child: Center(child: Text("$teamScore")),
+              ),
+              Container(
+                child: Center(child: Text("$opponentScore")),
+                color: opponentScore > teamScore ? AppColors.yellow : null,
+                width: 30,
+              ),
+            ],
           ),
-          Container(
-            child: Center(child: Text("$opponentScore")),
-            color: opponentScore > teamScore ? AppColors.yellow : null,
-            width: 30,
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }
