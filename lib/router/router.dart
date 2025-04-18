@@ -5,7 +5,8 @@ import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/pages/StatsPage.dart';
 import 'package:sample_sport_stats/pages/TeamsSelection/TeamsSelectionPage.dart';
 import 'package:sample_sport_stats/pages/currentGame/CurrentMatchPage.dart';
-import 'package:sample_sport_stats/pages/history/HistoryPage.dart';
+import 'package:sample_sport_stats/pages/histories/HistoriesPage.dart';
+import 'package:sample_sport_stats/pages/history/History.dart';
 import 'package:sample_sport_stats/pages/matchMenu/MatchPage.dart';
 import 'package:sample_sport_stats/router/routes.dart';
 
@@ -41,8 +42,15 @@ final router = GoRouter(
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: Routes.historyPage,
-                  builder: (context, state) => HistoryPage())
+                  path: Routes.historiesPage,
+                  builder: (context, state) => const HistoriesPage(),
+                  routes: [
+                    GoRoute(
+                        path: Routes.historyPage,
+                        builder: (context, state) => HistoryPage(
+                              game: state.extra as Game,
+                            ))
+                  ])
             ]),
             StatefulShellBranch(routes: [
               GoRoute(

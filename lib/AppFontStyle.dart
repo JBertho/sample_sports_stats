@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'AppColors.dart';
 
 class AppFontStyle {
+  static TextStyle inter = GoogleFonts.inter();
   static TextStyle anton = GoogleFonts.anton();
 
   static TextStyle header = GoogleFonts.anton(

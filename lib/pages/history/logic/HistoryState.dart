@@ -1,17 +1,19 @@
 import 'package:sample_sport_stats/models/Game.dart';
+import 'package:sample_sport_stats/models/MatchPlayer.dart';
+import 'package:sample_sport_stats/models/Team.dart';
 
 abstract class HistoryState {
-  List<Game> games;
+  Game game;
 
-  HistoryState(this.games);
+  HistoryState(this.game);
 }
 
-class InitTeamState extends HistoryState {
-  InitTeamState(): super(List.empty());
+class InitHistoryState extends HistoryState {
+  InitHistoryState(): super(Game(opponentName: "", teamPlayers: List.empty(), substitutes: List.empty(), opponentPlayer: MatchPlayer(name: "", number: 0), team: Team(name: "", division: "", season: "")));
 
 }
 
-class HistoryTeamState extends HistoryState {
-  HistoryTeamState(super.games);
+class DisplayHistoryState extends HistoryState {
+  DisplayHistoryState(super.game);
 
 }

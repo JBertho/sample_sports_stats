@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sample_sport_stats/pages/TeamsSelection/logic/TeamsSelectionCubit.dart';
-import 'package:sample_sport_stats/pages/history/logic/HistoryCubit.dart';
+import 'package:sample_sport_stats/pages/histories/logic/HistoriesCubit.dart';
 
 import 'models/Destination.dart';
 
@@ -30,7 +30,7 @@ class LayoutScaffold extends StatelessWidget {
         onDestinationSelected: (idx) {
           if(idx == LayoutScaffold.destinations.indexOf(historique)){
             var team = context.read<TeamSelectionCubit>().getTeam();
-            context.read<HistoryCubit>().initHistory(team);
+            context.read<HistoriesCubit>().initHistories(team);
           }
           return navigationShell.goBranch(idx);
           },

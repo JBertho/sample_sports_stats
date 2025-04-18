@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sample_sport_stats/pages/TeamsSelection/logic/TeamsSelectionCubit.dart';
+import 'package:sample_sport_stats/pages/histories/logic/HistoriesCubit.dart';
 import 'package:sample_sport_stats/pages/history/logic/HistoryCubit.dart';
 import 'package:sample_sport_stats/router/router.dart';
 
@@ -22,20 +23,23 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    return BlocProvider<TeamSelectionCubit>(
-        create: (_) => TeamSelectionCubit(TeamDao())..initTeamSelection(),
-        child: BlocProvider<HistoryCubit>(
-            create: (_) {
-              return HistoryCubit(gameDAO: GameDAO());
-            },
-            child: MaterialApp.router(
-              routerConfig: router,
-              debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-                useMaterial3: true,
-              ),
-            )));
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider<TeamSelectionCubit>(
+              create: (_) =>
+                  TeamSelectionCubit(TeamDao())..initTeamSelection()),
+          BlocProvider<HistoriesCubit>(
+              create: (_) => HistoriesCubit(gameDAO: GameDAO())),
+          BlocProvider<HistoryCubit>(create: (_) => HistoryCubit()),
+        ],
+        child: MaterialApp.router(
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+        ));
   }
 }
 
