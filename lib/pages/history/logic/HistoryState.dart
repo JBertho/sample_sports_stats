@@ -9,7 +9,7 @@ abstract class HistoryState {
 }
 
 class InitHistoryState extends HistoryState {
-  InitHistoryState(): super(Game(opponentName: "", teamPlayers: List.empty(), substitutes: List.empty(), opponentPlayer: MatchPlayer(name: "", number: 0), team: Team(name: "", division: "", season: "")));
+  InitHistoryState(): super(Game(opponentName: "", teamPlayers: List.empty(), substitutes: List.empty(), opponentPlayer: MatchPlayer(name: "", number: 0), team: Team(name: "", division: "", season: ""), quarters: []));
 
 }
 

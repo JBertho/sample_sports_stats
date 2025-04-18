@@ -1,6 +1,7 @@
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/History.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
+import 'package:sample_sport_stats/models/Quarter.dart';
 import 'package:sample_sport_stats/models/Team.dart';
 
 abstract class CurrentGameState {
@@ -13,6 +14,7 @@ abstract class CurrentGameState {
   final List<MatchPlayer> teamPlayers;
   final List<MatchPlayer> substitutes;
   final List<History> histories;
+  final List<Quarter> quarters;
 
   CurrentGameState(
       {required this.teamScore,
@@ -22,7 +24,8 @@ abstract class CurrentGameState {
       required this.teamPlayers,
       required this.substitutes,
       required this.atHome,
-      required this.team});
+      required this.team,
+      required this.quarters});
 }
 
 class CurrentGameInitial extends CurrentGameState {
@@ -34,7 +37,8 @@ class CurrentGameInitial extends CurrentGameState {
       required super.teamPlayers,
       required super.substitutes,
       required super.atHome,
-      required super.team});
+      required super.team,
+      required super.quarters});
 }
 
 class CurrentGameInProgress extends CurrentGameState {
@@ -55,7 +59,8 @@ class CurrentGameInProgress extends CurrentGameState {
       required super.teamPlayers,
       required super.substitutes,
       required super.atHome,
-      required super.team});
+      required super.team,
+      required super.quarters});
 }
 
 class CurrentGameAskToFinish extends CurrentGameInProgress {
@@ -67,5 +72,6 @@ class CurrentGameAskToFinish extends CurrentGameInProgress {
       required super.teamPlayers,
       required super.substitutes,
       required super.atHome,
-      required super.team});
+      required super.team,
+      required super.quarters});
 }

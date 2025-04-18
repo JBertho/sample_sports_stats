@@ -7,6 +7,7 @@ import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/models/History.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
+import 'package:sample_sport_stats/models/Quarter.dart';
 import 'package:sample_sport_stats/models/Team.dart';
 
 import 'CurrentGameState.dart';
@@ -21,7 +22,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
             teamPlayers: List.empty(),
             substitutes: List.empty(),
             atHome: true,
-            team: Team(name: "", division: "", season: "")));
+            team: Team(name: "", division: "", season: ""),
+            quarters: List.empty()));
 
   void initGame(Game game) {
     emit(CurrentGameInProgress(
@@ -32,7 +34,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         opponent: MatchPlayer(name: game.opponentName, number: 0),
         teamPlayers: game.teamPlayers,
         substitutes: game.substitutes,
-        atHome: game.atHome));
+        atHome: game.atHome,
+        quarters: List.empty()));
   }
 
   void selectPlayer(MatchPlayer player, Duration elapsedTime) {
@@ -49,7 +52,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           histories: currentState.histories,
           teamPlayers: currentState.teamPlayers,
           substitutes: currentState.substitutes,
-          atHome: currentState.atHome));
+          atHome: currentState.atHome,
+          quarters: currentState.quarters));
     } else if (currentState.selectedAction != null) {
       saveAction(player, currentState.selectedAction!, elapsedTime);
     } else if (currentState.selectedSubPlayer != null) {
@@ -70,7 +74,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           histories: currentState.histories,
           teamPlayers: currentState.teamPlayers,
           substitutes: currentState.substitutes,
-          atHome: currentState.atHome));
+          atHome: currentState.atHome,
+          quarters: currentState.quarters));
     } else {
       substitutePlayer(currentState.selectedPlayer!, player);
     }
@@ -90,7 +95,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           histories: currentState.histories,
           teamPlayers: currentState.teamPlayers,
           substitutes: currentState.substitutes,
-          atHome: currentState.atHome));
+          atHome: currentState.atHome,
+          quarters: currentState.quarters));
     } else if (currentState.selectedOpponentPlayer != null) {
       saveAction(currentState.selectedOpponentPlayer!, actionGame, elapsedTime);
     } else {
@@ -111,7 +117,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           histories: currentState.histories,
           teamPlayers: currentState.teamPlayers,
           substitutes: currentState.substitutes,
-          atHome: currentState.atHome));
+          atHome: currentState.atHome,
+          quarters: currentState.quarters));
       return;
     }
 
@@ -129,7 +136,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         histories: currentState.histories,
         teamPlayers: currentState.teamPlayers,
         substitutes: currentState.substitutes,
-        atHome: currentState.atHome));
+        atHome: currentState.atHome,
+        quarters: currentState.quarters));
   }
 
   void saveAction(
@@ -175,7 +183,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         histories: newHistories,
         teamPlayers: currentState.teamPlayers,
         substitutes: currentState.substitutes,
-        atHome: currentState.atHome));
+        atHome: currentState.atHome,
+        quarters: currentState.quarters));
   }
 
   void deleteHistory(History history) {
@@ -221,7 +230,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           histories: histories,
           teamPlayers: currentState.teamPlayers,
           substitutes: currentState.substitutes,
-          atHome: currentState.atHome));
+          atHome: currentState.atHome,
+          quarters: currentState.quarters));
     }
   }
 
@@ -234,12 +244,14 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         teamPlayers: state.teamPlayers,
         substitutes: state.substitutes,
         atHome: state.atHome,
-        teamScore: state.teamScore));
+        teamScore: state.teamScore,
+        quarters: state.quarters));
   }
 
   void finishGame() {
     var gameDAO = GameDAO();
     log("SAUVEGARDE : ${state.opponent.name}");
+    log("SAUVEGARDE : ${state.quarters}");
     gameDAO.insertGame(GameEntity.fromModel(Game(
         team: state.team,
         opponentName: state.opponent.name,
@@ -248,10 +260,32 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         opponentScore: state.opponentScore,
         substitutes: state.substitutes,
         opponentPlayer: state.opponent,
-        teamPlayers: state.teamPlayers)));
+        teamPlayers: state.teamPlayers, quarters: state.quarters)));
 
     gameDAO.getGames().then((values) {
       log("DEBUG DB $values");
     });
+  }
+
+  void saveQuarter(int quarterNumber, Duration duration) {
+
+    var newQuarter = Quarter(
+        teamScore: state.teamScore,
+        opponentScore: state.opponentScore,
+        quarterNumber: quarterNumber,
+        duration: duration);
+    var quarters = List.of(state.quarters);
+
+    quarters.add(newQuarter);
+    emit(CurrentGameInProgress(
+        team: state.team,
+        teamScore: state.teamScore,
+        opponentScore: state.opponentScore,
+        opponent: state.opponent,
+        histories: state.histories,
+        teamPlayers: state.teamPlayers,
+        substitutes: state.substitutes,
+        atHome: state.atHome,
+        quarters: quarters));
   }
 }

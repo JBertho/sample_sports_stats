@@ -51,7 +51,7 @@ class _MatchPage extends StatelessWidget {
               .map((player) =>
               MatchPlayer(name: player.name, number: player.number))
               .toList(),
-          opponentPlayer: MatchPlayer(name: state.opponentName, number: 0),
+          opponentPlayer: MatchPlayer(name: state.opponentName, number: 0), quarters: [],
         );
         context.push(Routes.nestedCurrentMatchPage, extra: newGame);
       }

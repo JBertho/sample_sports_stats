@@ -1,5 +1,7 @@
 import 'package:sample_sport_stats/infrastructure/Entities/game_entity.dart';
+import 'package:sample_sport_stats/infrastructure/Entities/quarter_entity.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
+import 'package:sample_sport_stats/models/Quarter.dart';
 import 'package:sample_sport_stats/models/Team.dart';
 
 class Game {
@@ -12,6 +14,7 @@ class Game {
   final List<MatchPlayer> substitutes;
   final MatchPlayer opponentPlayer;
   final Team team;
+  final List<Quarter> quarters;
 
   Game(
       {required this.opponentName,
@@ -22,10 +25,11 @@ class Game {
       required this.teamPlayers,
       required this.substitutes,
       required this.opponentPlayer,
-        required this.team
+        required this.team,
+        required this.quarters
       });
 
-  static Game fromEntity(GameEntity game, Team team) {
+  static Game fromEntity(GameEntity game, Team team, List<QuarterEntity> quarters) {
     return Game(
         opponentName: game.opponentName,
         opponentScore: game.opponentScore,
@@ -33,6 +37,7 @@ class Game {
         teamPlayers: List.empty(),
         substitutes: List.empty(),
         atHome: game.atHome,
-        team: team, opponentPlayer: MatchPlayer(name: game.opponentName, number: 0));
+        team: team, opponentPlayer: MatchPlayer(name: game.opponentName, number: 0),
+        quarters: quarters.map((quarter) =>  Quarter.fromEntity(quarter)).toList());
   }
 }

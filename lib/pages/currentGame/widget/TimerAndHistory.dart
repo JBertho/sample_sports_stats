@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample_sport_stats/AppColors.dart';
@@ -18,9 +16,9 @@ class TimerAndHistory extends StatelessWidget {
   final CurrentGameInProgress state;
 
   Widget buildHistoryString(History history) {
-    if (history.actionGame.type == ActionType.failedShot
-        || history.actionGame.type == ActionType.turnover
-        || history.actionGame.type == ActionType.fault) {
+    if (history.actionGame.type == ActionType.failedShot ||
+        history.actionGame.type == ActionType.turnover ||
+        history.actionGame.type == ActionType.fault) {
       return RichText(
           text: TextSpan(
               style: AppFontStyle.anton.copyWith(color: Colors.black),
@@ -34,9 +32,9 @@ class TimerAndHistory extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold)),
           ]));
     }
-    if (history.actionGame.type == ActionType.point
-        || history.actionGame.type == ActionType.rebound
-        || history.actionGame.type == ActionType.counter) {
+    if (history.actionGame.type == ActionType.point ||
+        history.actionGame.type == ActionType.rebound ||
+        history.actionGame.type == ActionType.counter) {
       return RichText(
           text: TextSpan(
               style: AppFontStyle.anton.copyWith(color: Colors.black),
@@ -66,9 +64,8 @@ class TimerAndHistory extends StatelessWidget {
         children: [
           Consumer<ChronometerModel>(
               builder: (context, chronometerModel, child) {
-            log(chronometerModel.elapsedTime.toString());
             return Chronometer(
-              periodNumber: 1,
+              periodNumber: chronometerModel.quarter,
               chronometerModel: chronometerModel,
             );
           }),
@@ -121,8 +118,14 @@ class Chronometer extends StatefulWidget {
 }
 
 class _ChronometerState extends State<Chronometer> {
+  static const quarterDuration = Duration(seconds: 20);
+
   void _startStopwatch() {
     widget.chronometerModel.startStopwatch();
+  }
+  void _nextQuarter(BuildContext context) {
+    context.read<CurrentGameCubit>().saveQuarter(widget.chronometerModel.quarter, widget.chronometerModel.elapsedTime);
+    widget.chronometerModel.nextQuarter();
   }
 
   String _formatElapsedTime(Duration time) {
@@ -150,27 +153,55 @@ class _ChronometerState extends State<Chronometer> {
         ),
 
         const SizedBox(height: 20.0),
-        Material(
-            color: AppColors.orange,
-            borderRadius: BorderRadius.circular(57.5),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(57.5),
-              splashColor: Colors.deepOrange,
-              onTap: _startStopwatch,
-              child: Container(
-                width: 69,
-                height: 69,
-                child: Center(
-                  child: Icon(
-                    widget.chronometerModel.isRunning()
-                        ? Icons.pause
-                        : Icons.play_arrow,
-                    size: 40,
-                    color: Colors.white,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Material(
+                color: AppColors.orange,
+                borderRadius: BorderRadius.circular(57.5),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(57.5),
+                  splashColor: Colors.deepOrange,
+                  onTap: _startStopwatch,
+                  child: Container(
+                    width: 69,
+                    height: 69,
+                    child: Center(
+                      child: Icon(
+                        widget.chronometerModel.isRunning()
+                            ? Icons.pause
+                            : Icons.play_arrow,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ))
+                )),
+            if (widget.chronometerModel.elapsedTime > quarterDuration)
+              const SizedBox(width: 50),
+            if (widget.chronometerModel.elapsedTime > quarterDuration)
+              Material(
+                  color: AppColors.orange,
+                  borderRadius: BorderRadius.circular(57.5),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(57.5),
+                    splashColor: Colors.deepOrange,
+                    onTap: () => _nextQuarter(context),
+                    child: Container(
+                      width: 69,
+                      height: 69,
+                      child: const Center(
+                        child: Icon(
+                          Icons.add,
+                          size: 40,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ))
+          ],
+        )
         // Start/Stop and Reset buttons
       ],
     );
