@@ -1,9 +1,14 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sample_sport_stats/AppColors.dart';
+import 'package:sample_sport_stats/models/Game.dart';
 
 class LineChartSample2 extends StatefulWidget {
-  const LineChartSample2({super.key});
+  final Game game;
+
+  const LineChartSample2({super.key, required this.game});
 
   @override
   State<LineChartSample2> createState() => _LineChartSample2State();
@@ -26,7 +31,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
     return Stack(
       children: <Widget>[
         AspectRatio(
-          aspectRatio: 1.70,
+          aspectRatio: 2,
           child: Padding(
             padding: const EdgeInsets.only(
               right: 18,
@@ -35,7 +40,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
               bottom: 12,
             ),
             child: LineChart(
-              showAvg ? avgData() : mainData(),
+              mainData(),
             ),
           ),
         ),
@@ -71,13 +76,16 @@ class _LineChartSample2State extends State<LineChartSample2> {
     Widget text;
     switch (value.toInt()) {
       case 2:
-        text = const Text('MAR', style: style);
+        text = const Text('1ER QT', style: style);
         break;
-      case 5:
-        text = const Text('JUN', style: style);
+      case 4:
+        text = const Text('2EME QT', style: style);
+        break;
+      case 6:
+        text = const Text('3EME QT', style: style);
         break;
       case 8:
-        text = const Text('SEP', style: style);
+        text = const Text('4EME QT', style: style);
         break;
       default:
         text = const Text('', style: style);
@@ -90,36 +98,15 @@ class _LineChartSample2State extends State<LineChartSample2> {
     );
   }
 
-  Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 15,
-    );
-    String text;
-    switch (value.toInt()) {
-      case 1:
-        text = '10K';
-        break;
-      case 3:
-        text = '30k';
-        break;
-      case 5:
-        text = '50k';
-        break;
-      default:
-        return Container();
-    }
-
-    return Text(text, style: style, textAlign: TextAlign.left);
-  }
-
   LineChartData mainData() {
+    var game = widget.game;
+    var maxScore = game.quarters
+        .map((quarter) => max(quarter.teamScore, quarter.opponentScore))
+        .reduce(max);
     return LineChartData(
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
-        horizontalInterval: 1,
-        verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
           return const FlLine(
             color: AppColors.blue,
@@ -144,7 +131,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 30,
+            reservedSize: 60,
             interval: 1,
             getTitlesWidget: bottomTitleWidgets,
           ),
@@ -152,8 +139,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 1,
-            getTitlesWidget: leftTitleWidgets,
+            interval: 10,
             reservedSize: 42,
           ),
         ),
@@ -163,29 +149,24 @@ class _LineChartSample2State extends State<LineChartSample2> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 11,
+      maxX: 8,
       minY: 0,
-      maxY: 6,
+      maxY: maxScore.toDouble(),
       lineBarsData: [
         LineChartBarData(
-          spots: const [
-            FlSpot(0, 3),
-            FlSpot(2.6, 2),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 3.1),
-            FlSpot(8, 4),
-            FlSpot(9.5, 3),
-            FlSpot(11, 4),
+          spots: [
+            FlSpot(0, 0),
+            FlSpot(2, game.getQuarterTeamScore(1).toDouble()),
+            FlSpot(4, game.getQuarterTeamScore(2).toDouble()),
+            FlSpot(6, game.getQuarterTeamScore(3).toDouble()),
+            FlSpot(8, game.getQuarterTeamScore(4).toDouble()),
           ],
-          isCurved: true,
+          isCurved: false,
           gradient: LinearGradient(
             colors: gradientColors,
           ),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
@@ -196,127 +177,25 @@ class _LineChartSample2State extends State<LineChartSample2> {
           ),
         ),
         LineChartBarData(
-          spots: const [
+          spots: [
             FlSpot(0, 0),
-            FlSpot(1, 4),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 2.3),
-            FlSpot(8, 2.8),
-            FlSpot(9.5, 3.4),
-            FlSpot(11, 6),
+            FlSpot(2, game.getQuarterOpponentScore(1).toDouble()),
+            FlSpot(4, game.getQuarterOpponentScore(2).toDouble()),
+            FlSpot(6, game.getQuarterOpponentScore(3).toDouble()),
+            FlSpot(8, game.getQuarterOpponentScore(4).toDouble()),
           ],
-          isCurved: true,
+          isCurved: false,
           gradient: LinearGradient(
             colors: opponentGradientColors,
           ),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
               colors: opponentGradientColors
                   .map((color) => color.withValues(alpha: 0.3))
                   .toList(),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  LineChartData avgData() {
-    return LineChartData(
-      lineTouchData: const LineTouchData(enabled: false),
-      gridData: FlGridData(
-        show: true,
-        drawHorizontalLine: true,
-        verticalInterval: 1,
-        horizontalInterval: 1,
-        getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-        getDrawingHorizontalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-      ),
-      titlesData: FlTitlesData(
-        show: true,
-        bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            getTitlesWidget: bottomTitleWidgets,
-            interval: 1,
-          ),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            getTitlesWidget: leftTitleWidgets,
-            reservedSize: 42,
-            interval: 1,
-          ),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-      ),
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: const Color(0xff37434d)),
-      ),
-      minX: 0,
-      maxX: 11,
-      minY: 0,
-      maxY: 6,
-      lineBarsData: [
-        LineChartBarData(
-          spots: const [
-            FlSpot(0, 3.44),
-            FlSpot(2.6, 3.44),
-            FlSpot(4.9, 3.44),
-            FlSpot(6.8, 3.44),
-            FlSpot(8, 3.44),
-            FlSpot(9.5, 3.44),
-            FlSpot(11, 3.44),
-          ],
-          isCurved: true,
-          gradient: LinearGradient(
-            colors: [
-              ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                  .lerp(0.2)!,
-              ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                  .lerp(0.2)!,
-            ],
-          ),
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              colors: [
-                ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                    .lerp(0.2)!
-                    .withValues(alpha: 0.1),
-                ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                    .lerp(0.2)!
-                    .withValues(alpha: 0.1),
-              ],
             ),
           ),
         ),

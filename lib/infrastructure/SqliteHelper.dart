@@ -20,7 +20,7 @@ class SqliteHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         // Create tables and define schema
         await db.execute('''
@@ -41,7 +41,29 @@ class SqliteHelper {
             team_id INTEGER
           )
         ''');
+        await db.execute('''
+          CREATE TABLE quarter (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_id INTEGER,
+            team_score INTEGER,
+            opponent_score INTEGER,
+            quarter_number INTEGER,
+            duration INTEGER
+          )
+        ''');
       },
+      onUpgrade: (db, previous, after) async {
+        await db.execute('''
+          CREATE TABLE quarter (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_id INTEGER,
+            team_score INTEGER,
+            opponent_score INTEGER,
+            quarter_number INTEGER,
+            duration INTEGER
+          )
+        ''');
+      }
     );
   }
 

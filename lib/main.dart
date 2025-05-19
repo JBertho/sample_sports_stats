@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sample_sport_stats/infrastructure/DAO/quarter_dao.dart';
 import 'package:sample_sport_stats/pages/TeamsSelection/logic/TeamsSelectionCubit.dart';
 import 'package:sample_sport_stats/pages/histories/logic/HistoriesCubit.dart';
 import 'package:sample_sport_stats/pages/history/logic/HistoryCubit.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
               create: (_) =>
                   TeamSelectionCubit(TeamDao())..initTeamSelection()),
           BlocProvider<HistoriesCubit>(
-              create: (_) => HistoriesCubit(gameDAO: GameDAO())),
+              create: (_) => HistoriesCubit(gameDAO: GameDAO(), quarterDao: QuarterDao())),
           BlocProvider<HistoryCubit>(create: (_) => HistoryCubit()),
         ],
         child: MaterialApp.router(

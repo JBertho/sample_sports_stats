@@ -24,4 +24,6 @@ class Quarter {
         quarterNumber: quarter.quarterNumber,
         duration: quarter.duration);
   }
+
+
 }

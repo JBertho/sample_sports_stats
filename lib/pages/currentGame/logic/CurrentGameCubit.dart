@@ -1,8 +1,8 @@
-import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:sample_sport_stats/infrastructure/DAO/game_dao.dart';
+import 'package:sample_sport_stats/infrastructure/DAO/quarter_dao.dart';
 import 'package:sample_sport_stats/infrastructure/Entities/game_entity.dart';
+import 'package:sample_sport_stats/infrastructure/Entities/quarter_entity.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/models/History.dart';
@@ -248,11 +248,11 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         quarters: state.quarters));
   }
 
-  void finishGame() {
+  void finishGame() async {
     var gameDAO = GameDAO();
-    log("SAUVEGARDE : ${state.opponent.name}");
-    log("SAUVEGARDE : ${state.quarters}");
-    gameDAO.insertGame(GameEntity.fromModel(Game(
+    var quarterDao = QuarterDao();
+
+    var insertGameId = await gameDAO.insertGame(GameEntity.fromModel(Game(
         team: state.team,
         opponentName: state.opponent.name,
         atHome: state.atHome,
@@ -260,15 +260,16 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         opponentScore: state.opponentScore,
         substitutes: state.substitutes,
         opponentPlayer: state.opponent,
-        teamPlayers: state.teamPlayers, quarters: state.quarters)));
+        teamPlayers: state.teamPlayers,
+        quarters: state.quarters)));
 
-    gameDAO.getGames().then((values) {
-      log("DEBUG DB $values");
-    });
+    for (Quarter quarter in state.quarters) {
+      quarterDao.insertQuarter(
+          QuarterEntity.fromModelWithGameId(quarter, insertGameId));
+    }
   }
 
   void saveQuarter(int quarterNumber, Duration duration) {
-
     var newQuarter = Quarter(
         teamScore: state.teamScore,
         opponentScore: state.opponentScore,

@@ -40,4 +40,20 @@ class Game {
         team: team, opponentPlayer: MatchPlayer(name: game.opponentName, number: 0),
         quarters: quarters.map((quarter) =>  Quarter.fromEntity(quarter)).toList());
   }
+
+  int getQuarterTeamScore(int number) {
+    var emptyQuarter = Quarter(teamScore: 0, opponentScore: 0, quarterNumber: 0, duration: Duration.zero);
+    var quarter = quarters.firstWhere((quarter) => quarter.quarterNumber == number,
+        orElse: () => emptyQuarter);
+
+    return quarter.teamScore;
+  }
+
+  int getQuarterOpponentScore(int number) {
+    var emptyQuarter = Quarter(teamScore: 0, opponentScore: 0, quarterNumber: 0, duration: Duration.zero);
+    var quarter = quarters.firstWhere((quarter) => quarter.quarterNumber == number,
+        orElse: () => emptyQuarter);
+
+    return quarter.opponentScore;
+  }
 }
