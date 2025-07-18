@@ -30,6 +30,7 @@ class Game {
       });
 
   static Game fromEntity(GameEntity game, Team team, List<QuarterEntity> quarters) {
+    var finalQuarters = quarters.length < 4 ? _addEmptyQuarters(quarters) : quarters;
     return Game(
         opponentName: game.opponentName,
         opponentScore: game.opponentScore,
@@ -38,7 +39,7 @@ class Game {
         substitutes: List.empty(),
         atHome: game.atHome,
         team: team, opponentPlayer: MatchPlayer(name: game.opponentName, number: 0),
-        quarters: quarters.map((quarter) =>  Quarter.fromEntity(quarter)).toList());
+        quarters: finalQuarters.map((quarter) =>  Quarter.fromEntity(quarter)).toList());
   }
 
   int getQuarterTeamScore(int number) {
@@ -55,5 +56,14 @@ class Game {
         orElse: () => emptyQuarter);
 
     return quarter.opponentScore;
+  }
+
+  static List<QuarterEntity> _addEmptyQuarters(List<QuarterEntity> quarters) {
+    List<QuarterEntity> finalList = List<QuarterEntity>.from(quarters);
+    for(int i = quarters.length;i < 4; i += 1) {
+      finalList.add(QuarterEntity(gameId: 0, teamScore: 0, opponentScore: 0, quarterNumber: i, duration: const Duration()));
+    }
+
+    return finalList;
   }
 }
