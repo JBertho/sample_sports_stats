@@ -114,9 +114,9 @@ class ActionsSide extends StatelessWidget {
             Padding(
                 padding: EdgeInsets.only(right: 6, left: 6),
                 child: ActionBtn(
-                    callback: () => selectAction(context, ActionGame.block),
+                    callback: () => selectAction(context, ActionGame.counter),
                     displayValue: 'contre',
-                    color: selectedActionGame == ActionGame.block
+                    color: selectedActionGame == ActionGame.counter
                         ? AppColors.greenBtnSelected
                         : AppColors.greenBtn)),
             Padding(

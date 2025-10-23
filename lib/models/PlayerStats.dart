@@ -16,47 +16,79 @@ class PlayerStats {
 
   int _fault = 0;
   int _turnover = 0;
+  int _interception = 0;
 
-
-  void addSuccessFreePoint() {
-    _score += 1;
-    _successFreeThrow += 1;
-  }
-  void addSuccessTwoPoint() {
-    _score += 2;
-    _successTwoPoint += 1;
-  }
-  void addSuccessThreePoint() {
-    _score += 3;
-    _successThreePoint += 1;
-  }
-  void addFailedFreeThrow() {
-    _failedFreeThrow += 1;
-  }
-  void addFailedTwoPoint() {
-    _failedTwoPoint += 1;
-  }
-  void addFailedThreePoint() {
-    _failedThreePoint += 1;
-  }
-  void addCounter() {
-    _counter += 1;
-  }
-  void addBlock() {
-    _block += 1;
-  }
-  void addReboundOff() {
-    _reboundOff += 1;
-  }
-  void addReboundDef() {
-    _reboundDef += 1;
+  Map<String, int> toMap() {
+    return {
+      'score': _score,
+      'failedFreeThrow': _failedFreeThrow,
+      'failedTwoPoint': _failedTwoPoint,
+      'failedThreePoint': _failedThreePoint,
+      'successFreeThrow': _successFreeThrow,
+      'successTwoPoint': _successTwoPoint,
+      'successThreePoint': _successThreePoint,
+      'counter': _counter,
+      'block': _block,
+      'reboundOff': _reboundOff,
+      'reboundDef': _reboundDef,
+      'fault': _fault,
+      'turnover': _turnover,
+      'interception': _interception,
+    };
   }
 
-  void addFault() {
-    _fault += 1;
+  void updateSuccessFreePoint(int value) {
+    _score += value;
+    _successFreeThrow += value;
   }
 
-  void addTurnover() {
-    _turnover += 1;
+  void updateSuccessTwoPoint(int value) {
+    _score += 2 * value;
+    _successTwoPoint += value;
+  }
+
+  void updateSuccessThreePoint(int value) {
+    _score += 3 * value;
+    _successThreePoint += value;
+  }
+
+  void updateFailedFreeThrow(int value) {
+    _failedFreeThrow += value;
+  }
+
+  void updateFailedTwoPoint(int value) {
+    _failedTwoPoint += value;
+  }
+
+  void updateFailedThreePoint(int value) {
+    _failedThreePoint += value;
+  }
+
+  void updateCounter(int value) {
+    _counter += value;
+  }
+
+  void updateBlock(int value) {
+    _block += value;
+  }
+
+  void updateReboundOff(int value) {
+    _reboundOff += value;
+  }
+
+  void updateReboundDef(int value) {
+    _reboundDef += value;
+  }
+
+  void updateFault(int value) {
+    _fault += value;
+  }
+
+  void updateTurnover(int value) {
+    _turnover += value;
+  }
+
+  void updateInterception(int value) {
+    _interception += value;
   }
 }

@@ -166,15 +166,11 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           player.fault += 1;
         }
         break;
-      case ActionType.failedShot:
-      //handle background stats
-      case ActionType.rebound:
-      //handle background stats
-      case ActionType.turnover:
-      //handle background stats
-      case ActionType.counter:
-      //handle background stats
+      default:
+        break;
     }
+    player.addPlayerStats(actionGame);
+
     emit(CurrentGameInProgress(
         team: currentState.team,
         teamScore: currentState.teamScore,
@@ -219,6 +215,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         case ActionType.counter:
         //handle background stats
       }
+      history.player.revertPlayerStats(history.actionGame);
 
       histories.remove(history);
       emit(CurrentGameInProgress(
@@ -277,6 +274,9 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         duration: duration);
     var quarters = List.of(state.quarters);
 
+    for (var player in state.teamPlayers) {
+      player.logStats();
+    }
     quarters.add(newQuarter);
     emit(CurrentGameInProgress(
         team: state.team,
