@@ -23,7 +23,7 @@ class HistoryPage extends StatelessWidget {
           return _HistoryPage(state: state);
         }
 
-        return Text("Historique non chargé");
+        return const Text("Historique non chargé");
       },
     );
   }
@@ -52,7 +52,7 @@ class _HistoryPage extends StatelessWidget {
                 style: AppFontStyle.header,
               )),
               bottom: TabBar(
-                tabs: [
+                tabs: const [
                   Tab(text: "Résumé"),
                   Tab(text: "Stats"),
                   Tab(text: "Tirs")

@@ -276,7 +276,7 @@ class CreationDialog extends StatelessWidget {
   final TextEditingController divisionController;
   final TextEditingController seasonController;
 
-  CreationDialog(
+  const CreationDialog(
       {super.key,
       required this.callback,
       required this.nameController,
@@ -309,31 +309,31 @@ class CreationDialog extends StatelessWidget {
             decoration: InputDecoration(
                 fillColor: AppColors.grey,
                 filled: true,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 hintText: "Nom de l'équipe",
                 helperStyle: AppFontStyle.anton),
             controller: nameController,
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
           TextField(
             decoration: InputDecoration(
                 fillColor: AppColors.grey,
                 filled: true,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 hintText: "Division",
                 helperStyle: AppFontStyle.anton),
             controller: divisionController,
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
           TextField(
             decoration: InputDecoration(
                 fillColor: AppColors.grey,
                 filled: true,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 hintText: "Saison",
                 helperStyle: AppFontStyle.anton),
             controller: seasonController,

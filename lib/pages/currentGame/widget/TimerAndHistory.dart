@@ -164,7 +164,7 @@ class _ChronometerState extends State<Chronometer> {
                   borderRadius: BorderRadius.circular(57.5),
                   splashColor: Colors.deepOrange,
                   onTap: _startStopwatch,
-                  child: Container(
+                  child: SizedBox(
                     width: 69,
                     height: 69,
                     child: Center(
@@ -188,10 +188,10 @@ class _ChronometerState extends State<Chronometer> {
                     borderRadius: BorderRadius.circular(57.5),
                     splashColor: Colors.deepOrange,
                     onTap: () => _nextQuarter(context),
-                    child: Container(
+                    child: const SizedBox(
                       width: 69,
                       height: 69,
-                      child: const Center(
+                      child: Center(
                         child: Icon(
                           Icons.add,
                           size: 40,

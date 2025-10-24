@@ -43,7 +43,7 @@ class _HistoriesPage extends StatelessWidget {
                       return Hystories(state: state);
                     }
 
-                    return Text("Liste vide");
+                    return const Text("Liste vide");
                   },
                 ))));
   }
@@ -127,13 +127,13 @@ class HistoryWidget extends StatelessWidget {
                           children: [
                             Container(
                               width: 150,
-                              padding: EdgeInsets.only(left: 20),
+                              padding: const EdgeInsets.only(left: 20),
                               child: Text("18 Oct. 2024",
                                   style: AppFontStyle.inter),
                             ),
-                            Spacer(),
+                            const Spacer(),
                             Padding(
-                                padding: EdgeInsets.only(right: 30),
+                                padding: const EdgeInsets.only(right: 30),
                                 child: Text(
                                   game.team.name,
                                   style: AppFontStyle.inter,
@@ -150,8 +150,8 @@ class HistoryWidget extends StatelessWidget {
                                 padding: const EdgeInsets.only(left: 30),
                                 child: Text(game.opponentName,
                                     style: AppFontStyle.inter)),
-                            Spacer(),
-                            Padding(
+                            const Spacer(),
+                            const Padding(
                                 padding: EdgeInsets.only(right: 30),
                                 child: Icon(Icons.arrow_forward_sharp))
                           ],
@@ -171,7 +171,7 @@ class ScoreWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.symmetric(vertical: 5),
+        padding: const EdgeInsets.symmetric(vertical: 5),
         child: Container(
           decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(5)),

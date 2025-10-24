@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sample_sport_stats/AppColors.dart';
-import 'package:sample_sport_stats/pages/history/widgets/LineChartSample2.dart';
+import 'package:sample_sport_stats/pages/history/widgets/LineChartSample.dart';
 
 import '../../../AppFontStyle.dart';
 import '../logic/HistoryState.dart';
@@ -15,10 +15,10 @@ class DetailHistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 70),
+            padding: const EdgeInsets.symmetric(horizontal: 70),
             child: Column(
               children: [
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Expanded(
                       child: Align(
@@ -75,10 +75,10 @@ class DetailHistoryPage extends StatelessWidget {
                               child: Text(state.game.opponentName,
                                   style: AppFontStyle.header))))
                 ]),
-                SizedBox(height: 25),
-                Align(
-                  child: Text("Par quart-temps"),
+                const SizedBox(height: 25),
+                const Align(
                   alignment: AlignmentDirectional.centerStart,
+                  child: Text("Par quart-temps"),
                 ),
                 Container(
                   width: double.infinity,
@@ -86,7 +86,7 @@ class DetailHistoryPage extends StatelessWidget {
                       color: AppColors.white85,
                       borderRadius: BorderRadius.circular(10)),
                   child: Padding(
-                      padding: EdgeInsets.all(15),
+                      padding: const EdgeInsets.all(15),
                       child: DataTable(
                         columns: const <DataColumn>[
                           DataColumn(
@@ -125,7 +125,7 @@ class DetailHistoryPage extends StatelessWidget {
                           DataRow(
                             cells: <DataCell>[
                               DataCell(Text(state.game.team.name)),
-                              DataCell(Spacer()),
+                              const DataCell(Spacer()),
                               DataCell(Text(state.game
                                   .getQuarterTeamScore(1)
                                   .toString())),
@@ -143,7 +143,7 @@ class DetailHistoryPage extends StatelessWidget {
                           DataRow(
                             cells: <DataCell>[
                               DataCell(Text(state.game.opponentName)),
-                              DataCell(Spacer()),
+                              const DataCell(Spacer()),
                               DataCell(Text(state.game
                                   .getQuarterOpponentScore(1)
                                   .toString())),
@@ -161,15 +161,15 @@ class DetailHistoryPage extends StatelessWidget {
                         ],
                       )),
                 ),
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
                 Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
                         color: AppColors.white85,
                         borderRadius: BorderRadius.circular(10)),
                     child: Padding(
-                      padding: EdgeInsets.all(15),
-                      child: LineChartSample2(
+                      padding: const EdgeInsets.all(15),
+                      child: LineChartSample(
                         game: state.game,
                       ),
                     ))

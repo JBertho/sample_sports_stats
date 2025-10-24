@@ -12,7 +12,7 @@ class GameHeader extends StatelessWidget {
     required this.opponentScore,
   });
 
-  final double TEAM_SCORE_SPACING = 20;
+  static const double TEAM_SCORE_SPACING = 20;
 
   final String opponentName;
   final String teamName;
@@ -28,7 +28,7 @@ class GameHeader extends StatelessWidget {
             child: Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
-                    padding: EdgeInsets.only(right: TEAM_SCORE_SPACING),
+                    padding: const EdgeInsets.only(right: TEAM_SCORE_SPACING),
                     child: Text(teamName, style: AppFontStyle.header)))),
         Container(
           decoration: BoxDecoration(
@@ -63,7 +63,7 @@ class GameHeader extends StatelessWidget {
             child: Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                    padding: EdgeInsets.only(left: TEAM_SCORE_SPACING),
+                    padding: const EdgeInsets.only(left: TEAM_SCORE_SPACING),
                     child: Text(opponentName, style: AppFontStyle.header))))
       ]),
       Text(

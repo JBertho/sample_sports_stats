@@ -23,8 +23,8 @@ class QuarterDao {
 
   Future<List<QuarterEntity>> getQuartersByGame(int id) async {
     var quarters = await getQuarters();
-    log("GAME_ID : " + id.toString());
-    log("ALL : " + quarters.toString());
+    log("GAME_ID : $id");
+    log("ALL : $quarters");
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps =
         await db.query('quarter', where: 'game_id = ?', whereArgs: [id]);

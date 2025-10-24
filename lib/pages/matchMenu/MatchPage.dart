@@ -61,13 +61,13 @@ class _MatchPage extends StatelessWidget {
             color: AppColors.grey,
             child: Center(
                 child: Stack(children: [
-              Padding(
+              const Padding(
                   padding: EdgeInsets.only(top: 75, left: 22),
                   child: Image(
                     image: AssetImage('assets/court_bg.png'),
                   )),
               Padding(
-                  padding: EdgeInsets.only(top: 20),
+                  padding: const EdgeInsets.only(top: 20),
                   child: Column(
                     children: [
                       Row(
@@ -75,14 +75,14 @@ class _MatchPage extends StatelessWidget {
                         children: [
                           IconButton(onPressed: () {
                             context.pop();
-                          }, icon: Icon(Icons.arrow_back_outlined)),
+                          }, icon: const Icon(Icons.arrow_back_outlined)),
                           Column(
                             children: [
                               Text(state.team.name, style: AppFontStyle.blue34),
                             ]),
                           Visibility(visible: false, child: IconButton(onPressed: () {
                             context.push(Routes.teamsPage);
-                          }, icon: Icon(Icons.arrow_back_outlined)))
+                          }, icon: const Icon(Icons.arrow_back_outlined)))
                         ],
                       ),
                       Expanded(
@@ -132,30 +132,30 @@ class StartGameAndParameters extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Padding(
-            padding: EdgeInsets.only(top: 30),
+            padding: const EdgeInsets.only(top: 30),
             child: RectangleAnimatedButton(
               onPressed: () {},
               text: "Paramètres du match",
               visible: false,
             )),
         Padding(
-            padding: EdgeInsets.only(top: 20),
+            padding: const EdgeInsets.only(top: 20),
             child: RectangleAnimatedButton(
               onPressed: () {},
               text: "Statistiques avancées",
               visible: false,
             )),
-        Spacer(),
+        const Spacer(),
         CircularButton(onPressed: () {
           context.read<MatchCubit>().beginMatch(opponentNameController.text);
         }),
-        Spacer(),
+        const Spacer(),
         Padding(
-            padding: EdgeInsets.only(bottom: 20),
+            padding: const EdgeInsets.only(bottom: 20),
             child: RectangleAnimatedButton(
                 onPressed: () {}, text: "Paramètres du match")),
         Padding(
-            padding: EdgeInsets.only(bottom: 30),
+            padding: const EdgeInsets.only(bottom: 30),
             child: RectangleAnimatedButton(
                 onPressed: () {}, text: "Statistiques avancées")),
       ],
@@ -295,7 +295,7 @@ class OpponentGameConfiguration extends StatelessWidget {
         child: Column(
           children: [
             TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 fillColor: AppColors.grey,
                 filled: true,
                 border: OutlineInputBorder(),
@@ -308,7 +308,7 @@ class OpponentGameConfiguration extends StatelessWidget {
                 Expanded(
                     flex: 5,
                     child: Padding(
-                        padding: EdgeInsets.only(top: 10, right: 10),
+                        padding: const EdgeInsets.only(top: 10, right: 10),
                         child: SideSelectionButton(
                           onPressed: () =>
                               {context.read<MatchCubit>().updateAtHome()},
@@ -332,7 +332,7 @@ class OpponentGameConfiguration extends StatelessWidget {
               itemCount: 10,
               itemBuilder: (BuildContext context, int index) {
                 return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 5),
                     child: Row(
                       children: [
                         Expanded(
@@ -340,7 +340,7 @@ class OpponentGameConfiguration extends StatelessWidget {
                             child: Center(
                                 child: Text(
                               "Joueur adverse ${index + 1} ",
-                              style: TextStyle(fontSize: 15),
+                              style: const TextStyle(fontSize: 15),
                             ))),
                         Expanded(
                             flex: 5,
@@ -366,7 +366,7 @@ class OpponentGameConfiguration extends StatelessWidget {
 class CircularButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  CircularButton({required this.onPressed});
+  const CircularButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -377,7 +377,7 @@ class CircularButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(57.5),
           splashColor: Colors.deepOrange,
           onTap: onPressed, // Utilise la fonction passée en paramètre
-          child: Container(
+          child: SizedBox(
             width: 115,
             height: 115,
             child: Center(
@@ -402,8 +402,8 @@ class RectangleAnimatedButton extends StatelessWidget {
   final double width;
   final double height;
 
-  RectangleAnimatedButton(
-      {required this.onPressed,
+  const RectangleAnimatedButton(
+      {super.key, required this.onPressed,
       required this.text,
       this.visible = true,
       this.width = 160,
@@ -425,7 +425,7 @@ class RectangleAnimatedButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           splashColor: Colors.deepOrange,
           onTap: onPressed,
-          child: Container(
+          child: SizedBox(
             width: width,
             height: height,
             child: Center(

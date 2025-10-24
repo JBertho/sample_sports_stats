@@ -8,6 +8,6 @@ class ShootsHistoryPage extends StatelessWidget {
   const ShootsHistoryPage({super.key, required this.state});
   @override
   Widget build(BuildContext context) {
-    return Text("Les tirs");
+    return const Text("Les tirs");
   }
 }

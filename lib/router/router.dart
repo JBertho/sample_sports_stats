@@ -55,7 +55,7 @@ final router = GoRouter(
             StatefulShellBranch(routes: [
               GoRoute(
                   path: Routes.statsPage,
-                  builder: (context, state) => StatsPage()),
+                  builder: (context, state) => const StatsPage()),
             ])
           ]),
     ]);

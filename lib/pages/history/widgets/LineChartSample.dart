@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:sample_sport_stats/AppColors.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 
-class LineChartSample2 extends StatefulWidget {
+class LineChartSample extends StatefulWidget {
   final Game game;
 
-  const LineChartSample2({super.key, required this.game});
+  const LineChartSample({super.key, required this.game});
 
   @override
-  State<LineChartSample2> createState() => _LineChartSample2State();
+  State<LineChartSample> createState() => _LineChartSampleState();
 }
 
-class _LineChartSample2State extends State<LineChartSample2> {
+class _LineChartSampleState extends State<LineChartSample> {
   List<Color> gradientColors = [
     AppColors.orange,
     AppColors.yellow,
@@ -136,7 +136,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
             getTitlesWidget: bottomTitleWidgets,
           ),
         ),
-        leftTitles: AxisTitles(
+        leftTitles: const AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
             interval: 10,
@@ -155,7 +155,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
       lineBarsData: [
         LineChartBarData(
           spots: [
-            FlSpot(0, 0),
+            const FlSpot(0, 0),
             FlSpot(2, game.getQuarterTeamScore(1).toDouble()),
             FlSpot(4, game.getQuarterTeamScore(2).toDouble()),
             FlSpot(6, game.getQuarterTeamScore(3).toDouble()),
@@ -178,7 +178,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
         ),
         LineChartBarData(
           spots: [
-            FlSpot(0, 0),
+            const FlSpot(0, 0),
             FlSpot(2, game.getQuarterOpponentScore(1).toDouble()),
             FlSpot(4, game.getQuarterOpponentScore(2).toDouble()),
             FlSpot(6, game.getQuarterOpponentScore(3).toDouble()),

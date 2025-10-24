@@ -28,7 +28,7 @@ class ActionsSide extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-                padding: EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.only(right: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.freeThrow),
                     displayValue: '+1',
@@ -37,7 +37,7 @@ class ActionsSide extends StatelessWidget {
                         ? AppColors.greenBtnSelected
                         : AppColors.greenBtn)),
             Padding(
-                padding: EdgeInsets.only(right: 6, left: 6),
+                padding: const EdgeInsets.only(right: 6, left: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.twoPoint),
                     displayValue: '+2',
@@ -46,7 +46,7 @@ class ActionsSide extends StatelessWidget {
                         ? AppColors.greenBtnSelected
                         : AppColors.greenBtn)),
             Padding(
-                padding: EdgeInsets.only(left: 6),
+                padding: const EdgeInsets.only(left: 6),
                 child: ActionBtn(
                     callback: () =>
                         selectAction(context, ActionGame.threePoint),
@@ -63,7 +63,7 @@ class ActionsSide extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-                padding: EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.only(right: 6),
                 child: ActionBtn(
                   callback: () =>
                       selectAction(context, ActionGame.failedFreeThrow),
@@ -75,7 +75,7 @@ class ActionsSide extends StatelessWidget {
                   splashColor: Colors.redAccent,
                 )),
             Padding(
-                padding: EdgeInsets.only(right: 6, left: 6),
+                padding: const EdgeInsets.only(right: 6, left: 6),
                 child: ActionBtn(
                     callback: () =>
                         selectAction(context, ActionGame.failedTwoPoint),
@@ -86,7 +86,7 @@ class ActionsSide extends StatelessWidget {
                         : AppColors.redBtn,
                     splashColor: Colors.redAccent)),
             Padding(
-                padding: EdgeInsets.only(left: 6),
+                padding: const EdgeInsets.only(left: 6),
                 child: ActionBtn(
                     callback: () =>
                         selectAction(context, ActionGame.failedThreePoint),
@@ -103,7 +103,7 @@ class ActionsSide extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-                padding: EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.only(right: 6),
                 child: ActionBtn(
                   callback: () => selectAction(context, ActionGame.reboundOff),
                   displayValue: 'Rebond off',
@@ -112,7 +112,7 @@ class ActionsSide extends StatelessWidget {
                       : AppColors.greenBtn,
                 )),
             Padding(
-                padding: EdgeInsets.only(right: 6, left: 6),
+                padding: const EdgeInsets.only(right: 6, left: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.counter),
                     displayValue: 'contre',
@@ -120,7 +120,7 @@ class ActionsSide extends StatelessWidget {
                         ? AppColors.greenBtnSelected
                         : AppColors.greenBtn)),
             Padding(
-                padding: EdgeInsets.only(left: 6),
+                padding: const EdgeInsets.only(left: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.fault),
                     displayValue: 'Faute',
@@ -135,7 +135,7 @@ class ActionsSide extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-                padding: EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.only(right: 6),
                 child: ActionBtn(
                     callback: () =>
                         selectAction(context, ActionGame.reboundDef),
@@ -144,7 +144,7 @@ class ActionsSide extends StatelessWidget {
                         ? AppColors.greenBtnSelected
                         : AppColors.greenBtn)),
             Padding(
-                padding: EdgeInsets.only(right: 6, left: 6),
+                padding: const EdgeInsets.only(right: 6, left: 6),
                 child: ActionBtn(
                     callback: () =>
                         selectAction(context, ActionGame.interception),
@@ -153,7 +153,7 @@ class ActionsSide extends StatelessWidget {
                         ? AppColors.greenBtnSelected
                         : AppColors.greenBtn)),
             Padding(
-                padding: EdgeInsets.only(left: 6),
+                padding: const EdgeInsets.only(left: 6),
                 child: ActionBtn(
                     callback: () => selectAction(context, ActionGame.turnover),
                     displayValue: 'Perte de balle',

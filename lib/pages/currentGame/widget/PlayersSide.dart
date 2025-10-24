@@ -33,7 +33,7 @@ class PlayerSide extends StatelessWidget {
                   "Votre équipe",
                   style: AppFontStyle.anton,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Expanded(
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
