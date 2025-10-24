@@ -1,94 +1,94 @@
 class PlayerStats {
-  int _score = 0;
+  int score = 0;
 
-  int _failedFreeThrow = 0;
-  int _failedTwoPoint = 0;
-  int _failedThreePoint = 0;
-  int _successFreeThrow = 0;
-  int _successTwoPoint = 0;
-  int _successThreePoint = 0;
+  int failedFreeThrow = 0;
+  int failedTwoPoint = 0;
+  int failedThreePoint = 0;
+  int successFreeThrow = 0;
+  int successTwoPoint = 0;
+  int successThreePoint = 0;
 
-  int _counter = 0;
-  int _block = 0;
+  int counter = 0;
+  int block = 0;
 
-  int _reboundOff = 0;
-  int _reboundDef = 0;
+  int reboundOff = 0;
+  int reboundDef = 0;
 
-  int _fault = 0;
-  int _turnover = 0;
-  int _interception = 0;
+  int fault = 0;
+  int turnover = 0;
+  int interception = 0;
 
   Map<String, int> toMap() {
     return {
-      'score': _score,
-      'failedFreeThrow': _failedFreeThrow,
-      'failedTwoPoint': _failedTwoPoint,
-      'failedThreePoint': _failedThreePoint,
-      'successFreeThrow': _successFreeThrow,
-      'successTwoPoint': _successTwoPoint,
-      'successThreePoint': _successThreePoint,
-      'counter': _counter,
-      'block': _block,
-      'reboundOff': _reboundOff,
-      'reboundDef': _reboundDef,
-      'fault': _fault,
-      'turnover': _turnover,
-      'interception': _interception,
+      'score': score,
+      'failedFreeThrow': failedFreeThrow,
+      'failedTwoPoint': failedTwoPoint,
+      'failedThreePoint': failedThreePoint,
+      'successFreeThrow': successFreeThrow,
+      'successTwoPoint': successTwoPoint,
+      'successThreePoint': successThreePoint,
+      'counter': counter,
+      'block': block,
+      'reboundOff': reboundOff,
+      'reboundDef': reboundDef,
+      'fault': fault,
+      'turnover': turnover,
+      'interception': interception,
     };
   }
 
   void updateSuccessFreePoint(int value) {
-    _score += value;
-    _successFreeThrow += value;
+    score += value;
+    successFreeThrow += value;
   }
 
   void updateSuccessTwoPoint(int value) {
-    _score += 2 * value;
-    _successTwoPoint += value;
+    score += 2 * value;
+    successTwoPoint += value;
   }
 
   void updateSuccessThreePoint(int value) {
-    _score += 3 * value;
-    _successThreePoint += value;
+    score += 3 * value;
+    successThreePoint += value;
   }
 
   void updateFailedFreeThrow(int value) {
-    _failedFreeThrow += value;
+    failedFreeThrow += value;
   }
 
   void updateFailedTwoPoint(int value) {
-    _failedTwoPoint += value;
+    failedTwoPoint += value;
   }
 
   void updateFailedThreePoint(int value) {
-    _failedThreePoint += value;
+    failedThreePoint += value;
   }
 
   void updateCounter(int value) {
-    _counter += value;
+    counter += value;
   }
 
   void updateBlock(int value) {
-    _block += value;
+    block += value;
   }
 
   void updateReboundOff(int value) {
-    _reboundOff += value;
+    reboundOff += value;
   }
 
   void updateReboundDef(int value) {
-    _reboundDef += value;
+    reboundDef += value;
   }
 
   void updateFault(int value) {
-    _fault += value;
+    fault += value;
   }
 
   void updateTurnover(int value) {
-    _turnover += value;
+    turnover += value;
   }
 
   void updateInterception(int value) {
-    _interception += value;
+    interception += value;
   }
 }

@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:sample_sport_stats/infrastructure/DAO/game_dao.dart';
+import 'package:sample_sport_stats/infrastructure/DAO/player_stats_dao.dart';
 import 'package:sample_sport_stats/infrastructure/DAO/quarter_dao.dart';
 import 'package:sample_sport_stats/infrastructure/Entities/game_entity.dart';
+import 'package:sample_sport_stats/infrastructure/Entities/player_stats_entity.dart';
 import 'package:sample_sport_stats/infrastructure/Entities/quarter_entity.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/Game.dart';
@@ -248,6 +250,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
   void finishGame() async {
     var gameDAO = GameDAO();
     var quarterDao = QuarterDao();
+    var playerStatsDao = PlayerStatsDAO();
 
     var insertGameId = await gameDAO.insertGame(GameEntity.fromModel(Game(
         team: state.team,
@@ -263,6 +266,10 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     for (Quarter quarter in state.quarters) {
       quarterDao.insertQuarter(
           QuarterEntity.fromModelWithGameId(quarter, insertGameId));
+    }
+
+    for (MatchPlayer matchPlayer in state.teamPlayers) {
+      playerStatsDao.insertPlayerStats(PlayerStatsEntity.fromModel(matchPlayer.playerStats, playerId: matchPlayer.number, gameId: insertGameId));
     }
   }
 
