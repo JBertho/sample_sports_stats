@@ -2,9 +2,11 @@ import 'package:bloc/bloc.dart';
 import 'package:sample_sport_stats/infrastructure/DAO/game_dao.dart';
 import 'package:sample_sport_stats/infrastructure/DAO/player_stats_dao.dart';
 import 'package:sample_sport_stats/infrastructure/DAO/quarter_dao.dart';
+import 'package:sample_sport_stats/infrastructure/DAO/shot_position_dao.dart';
 import 'package:sample_sport_stats/infrastructure/Entities/game_entity.dart';
 import 'package:sample_sport_stats/infrastructure/Entities/player_stats_entity.dart';
 import 'package:sample_sport_stats/infrastructure/Entities/quarter_entity.dart';
+import 'package:sample_sport_stats/infrastructure/Entities/shot_position_entity.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/models/Game.dart';
 import 'package:sample_sport_stats/models/History.dart';
@@ -57,7 +59,13 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           atHome: currentState.atHome,
           quarters: currentState.quarters));
     } else if (currentState.selectedAction != null) {
-      saveAction(player, currentState.selectedAction!, elapsedTime);
+      saveAction(
+        player,
+        currentState.selectedAction!,
+        elapsedTime,
+        shotX: currentState.selectedShotX,
+        shotY: currentState.selectedShotY,
+      );
     } else if (currentState.selectedSubPlayer != null) {
       substitutePlayer(player, currentState.selectedSubPlayer!);
     }
@@ -83,7 +91,12 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     }
   }
 
-  void selectActionGame(ActionGame actionGame, Duration elapsedTime) {
+  void selectActionGame(
+    ActionGame actionGame,
+    Duration elapsedTime, {
+    double? shotX,
+    double? shotY,
+  }) {
     var currentState = state as CurrentGameInProgress;
 
     if (currentState.selectedPlayer == null &&
@@ -91,6 +104,8 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
       emit(CurrentGameInProgress(
           team: currentState.team,
           selectedAction: actionGame,
+          selectedShotX: shotX,
+          selectedShotY: shotY,
           teamScore: currentState.teamScore,
           opponentScore: currentState.opponentScore,
           opponent: currentState.opponent,
@@ -100,9 +115,21 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
           atHome: currentState.atHome,
           quarters: currentState.quarters));
     } else if (currentState.selectedOpponentPlayer != null) {
-      saveAction(currentState.selectedOpponentPlayer!, actionGame, elapsedTime);
+      saveAction(
+        currentState.selectedOpponentPlayer!,
+        actionGame,
+        elapsedTime,
+        shotX: shotX,
+        shotY: shotY,
+      );
     } else {
-      saveAction(currentState.selectedPlayer!, actionGame, elapsedTime);
+      saveAction(
+        currentState.selectedPlayer!,
+        actionGame,
+        elapsedTime,
+        shotX: shotX,
+        shotY: shotY,
+      );
     }
   }
 
@@ -143,12 +170,22 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
   }
 
   void saveAction(
-      MatchPlayer player, ActionGame actionGame, Duration elapsedTime) {
+    MatchPlayer player,
+    ActionGame actionGame,
+    Duration elapsedTime, {
+    double? shotX,
+    double? shotY,
+  }) {
     var currentState = state as CurrentGameInProgress;
 
     var histories = currentState.histories;
     var history = History(
-        actionGame: actionGame, player: player, elapsedTime: elapsedTime);
+      actionGame: actionGame,
+      player: player,
+      elapsedTime: elapsedTime,
+      shotX: shotX,
+      shotY: shotY,
+    );
     var newHistories = List.of(histories);
     newHistories.add(history);
 
@@ -251,6 +288,7 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     var gameDAO = GameDAO();
     var quarterDao = QuarterDao();
     var playerStatsDao = PlayerStatsDAO();
+    var shotPositionDao = ShotPositionDAO();
 
     var insertGameId = await gameDAO.insertGame(GameEntity.fromModel(Game(
         team: state.team,
@@ -270,6 +308,19 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
 
     for (MatchPlayer matchPlayer in state.teamPlayers) {
       playerStatsDao.insertPlayerStats(PlayerStatsEntity.fromModel(matchPlayer.playerStats, playerId: matchPlayer.number, gameId: insertGameId));
+    }
+
+    for (History history in state.histories) {
+      if (history.shotX == null || history.shotY == null) continue;
+      if (history.player == state.opponent) continue;
+      shotPositionDao.insertShotPosition(ShotPositionEntity(
+        gameId: insertGameId,
+        playerId: history.player.number,
+        actionType: history.actionGame.name,
+        shotX: history.shotX!,
+        shotY: history.shotY!,
+        elapsedTimeMs: history.elapsedTime.inMilliseconds,
+      ));
     }
   }
 

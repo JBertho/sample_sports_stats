@@ -2,21 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample_sport_stats/AppColors.dart';
 import 'package:sample_sport_stats/AppFontStyle.dart';
+import 'package:sample_sport_stats/pages/currentGame/widget/CourtShotSelector.dart';
 
 import '../../../models/ActionGame.dart';
 import '../logic/CurrentGameCubit.dart';
 import '../model/ChronometerModel.dart';
+
+const Set<ActionGame> _shotActions = {
+  ActionGame.twoPoint,
+  ActionGame.threePoint,
+  ActionGame.freeThrow,
+  ActionGame.failedTwoPoint,
+  ActionGame.failedThreePoint,
+  ActionGame.failedFreeThrow,
+};
 
 class ActionsSide extends StatelessWidget {
   final ActionGame? selectedActionGame;
 
   const ActionsSide({super.key, this.selectedActionGame});
 
-  void selectAction(BuildContext context, ActionGame actionGame) {
+  void selectAction(BuildContext context, ActionGame actionGame) async {
     var elapsedTime =
         Provider.of<ChronometerModel>(context, listen: false).elapsedTime;
 
-    context.read<CurrentGameCubit>().selectActionGame(actionGame, elapsedTime);
+    double? shotX;
+    double? shotY;
+    if (_shotActions.contains(actionGame)) {
+      final position = await CourtShotSelector.show(context, actionGame);
+      if (position == null) return;
+      shotX = position.dx;
+      shotY = position.dy;
+    }
+
+    if (!context.mounted) return;
+    context.read<CurrentGameCubit>().selectActionGame(
+          actionGame,
+          elapsedTime,
+          shotX: shotX,
+          shotY: shotY,
+        );
   }
 
   @override

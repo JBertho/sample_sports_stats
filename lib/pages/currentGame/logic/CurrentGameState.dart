@@ -46,12 +46,16 @@ class CurrentGameInProgress extends CurrentGameState {
   final ActionGame? selectedAction;
   final MatchPlayer? selectedOpponentPlayer;
   final MatchPlayer? selectedSubPlayer;
+  final double? selectedShotX;
+  final double? selectedShotY;
 
   CurrentGameInProgress(
       {this.selectedPlayer,
       this.selectedAction,
       this.selectedOpponentPlayer,
       this.selectedSubPlayer,
+      this.selectedShotX,
+      this.selectedShotY,
       required super.teamScore,
       required super.opponentScore,
       required super.histories,
