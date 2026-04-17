@@ -79,42 +79,44 @@ class SqliteHelper {
         ''');
       },
       onUpgrade: (db, previous, after) async {
-        await db.execute('''
-          CREATE TABLE quarter (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            game_id INTEGER,
-            team_score INTEGER,
-            opponent_score INTEGER,
-            quarter_number INTEGER,
-            duration INTEGER
-          )
-        ''');
-        await db.execute('''
-        CREATE TABLE player_stats (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        score INTEGER NOT NULL DEFAULT 0,
-        
-        failed_free_throw INTEGER NOT NULL DEFAULT 0,
-        failed_two_point INTEGER NOT NULL DEFAULT 0,
-        failed_three_point INTEGER NOT NULL DEFAULT 0,
-        success_free_throw INTEGER NOT NULL DEFAULT 0,
-        success_two_point INTEGER NOT NULL DEFAULT 0,
-        success_three_point INTEGER NOT NULL DEFAULT 0,
-        
-        counter INTEGER NOT NULL DEFAULT 0,
-        block INTEGER NOT NULL DEFAULT 0,
-        
-        rebound_off INTEGER NOT NULL DEFAULT 0,
-        rebound_def INTEGER NOT NULL DEFAULT 0,
-        
-        fault INTEGER NOT NULL DEFAULT 0,
-        turnover INTEGER NOT NULL DEFAULT 0,
-        interception INTEGER NOT NULL DEFAULT 0,
-        
-        player_id INTEGER NOT NULL,
-        game_id INTEGER NOT NULL
-      )
-        ''');
+        if (previous < 2) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS quarter (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              game_id INTEGER,
+              team_score INTEGER,
+              opponent_score INTEGER,
+              quarter_number INTEGER,
+              duration INTEGER
+            )
+          ''');
+          await db.execute('''
+          CREATE TABLE IF NOT EXISTS player_stats (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          score INTEGER NOT NULL DEFAULT 0,
+
+          failed_free_throw INTEGER NOT NULL DEFAULT 0,
+          failed_two_point INTEGER NOT NULL DEFAULT 0,
+          failed_three_point INTEGER NOT NULL DEFAULT 0,
+          success_free_throw INTEGER NOT NULL DEFAULT 0,
+          success_two_point INTEGER NOT NULL DEFAULT 0,
+          success_three_point INTEGER NOT NULL DEFAULT 0,
+
+          counter INTEGER NOT NULL DEFAULT 0,
+          block INTEGER NOT NULL DEFAULT 0,
+
+          rebound_off INTEGER NOT NULL DEFAULT 0,
+          rebound_def INTEGER NOT NULL DEFAULT 0,
+
+          fault INTEGER NOT NULL DEFAULT 0,
+          turnover INTEGER NOT NULL DEFAULT 0,
+          interception INTEGER NOT NULL DEFAULT 0,
+
+          player_id INTEGER NOT NULL,
+          game_id INTEGER NOT NULL
+        )
+          ''');
+        }
       }
     );
   }
