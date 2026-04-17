@@ -497,6 +497,62 @@ CREATE TABLE shot_positions (
 
 ---
 
+## Étape 4 : Filtrage des Tirs par Joueur (Header de Sélection)
+
+### Objectif
+Améliorer l'onglet "Tirs" de la page Historique en ajoutant un en-tête avec la liste des joueurs présents dans le match. Un bouton "Tous" (sélectionné par défaut) permet d'afficher tous les tirs, et les autres boutons filtrent pour un joueur spécifique. La visualisation du terrain et le résumé statistique se mettent à jour en fonction de la sélection.
+
+### Besoin utilisateur
+- Voir d'un coup d'œil qui a shooté où
+- Analyser la performance d'un joueur spécifique (ses zones chaudes/froides)
+- Comparer rapidement les joueurs en passant d'un filtre à l'autre
+
+### Fichiers à Modifier/Créer
+
+**À Modifier :**
+- `lib/pages/history/widgets/ShootsHistoryPage.dart`
+  - Devenir `StatefulWidget` pour gérer l'état de sélection
+  - Ajouter une barre horizontale de filtres en haut
+  - Filtrer la liste de tirs avant de la passer à `CourtShotsVisualization` et `_Summary`
+
+**À Créer :**
+- `lib/pages/history/widgets/PlayerFilterBar.dart` (optionnel, extraction possible)
+  - Widget stateless avec liste de "chips" joueurs + callback de sélection
+
+### Implémentation Détaillée
+
+#### 4.1 État et dérivation de la liste de joueurs
+- Stocker `int? _selectedPlayerId` (null = "Tous")
+- Dériver la liste unique des `playerId` depuis les `shots` chargés (tri croissant)
+- Construire une map `playerId → nom` depuis `state.game.teamPlayers` quand disponible ; fallback sur `"#numéro"`
+
+#### 4.2 Barre de filtres
+- `ListView` horizontal (ou `Wrap`) de `FilterChip` / boutons custom
+- Premier élément : "Tous" (sélectionné ⇒ `_selectedPlayerId == null`)
+- Élements suivants : un par joueur ayant au moins un tir
+- Style cohérent avec le thème (bleu `AppColors.blue` pour sélectionné, bordure/texte bleu pour non-sélectionné)
+
+#### 4.3 Filtrage
+- `filteredShots = _selectedPlayerId == null ? shots : shots.where((s) => s.playerId == _selectedPlayerId).toList()`
+- Passer `filteredShots` à `CourtShotsVisualization` et `_Summary`
+
+### Considérations UX
+- "Tous" toujours en premier, toujours visible
+- Si un seul joueur a tiré, masquer la barre (ou la laisser pour cohérence)
+- Feedback visuel clair sur la sélection active
+- Scroll horizontal fluide si beaucoup de joueurs
+
+### Vérification
+
+**Tests manuels :**
+1. Ouvrir un match avec plusieurs tireurs
+2. Vérifier que "Tous" est sélectionné par défaut et affiche tous les markers
+3. Cliquer sur un joueur → seuls ses tirs apparaissent, résumé mis à jour
+4. Revenir sur "Tous" → tout réapparaît
+5. Vérifier qu'un match sans tirs ou avec un seul joueur se comporte correctement
+
+---
+
 ## Ordre d'Exécution Recommandé
 
 ### Phase 1 : Foundation (Étape 1)
@@ -524,7 +580,14 @@ CREATE TABLE shot_positions (
 - (Optionnel) Implémenter BDD pour persistence
 - **Validation :** Tirs visibles sur terrain dans historique
 
-**Durée totale estimée :** 9-13 heures
+### Phase 5 : Filtrage par Joueur (Étape 4)
+**Durée estimée :** 1-2 heures
+- Transformer ShootsHistoryPage en StatefulWidget
+- Ajouter la barre de filtres (Tous + un bouton par joueur)
+- Filtrer markers et résumé selon sélection
+- **Validation :** Chaque joueur est isolable depuis le header, "Tous" rétablit la vue complète
+
+**Durée totale estimée :** 10-15 heures
 
 ---
 
@@ -701,8 +764,15 @@ Si beaucoup de matchs avec beaucoup de tirs :
 - [ ] Calculer stats résumé
 - [ ] Tester avec 0, 1, beaucoup de tirs
 - [ ] Vérifier performance
-- [ ] (Bonus) Ajouter filtres
 - [ ] (Bonus) Ajouter interaction sur markers
+
+### Étape 4 : Filtrage par Joueur
+- [ ] Transformer `ShootsHistoryPage` en `StatefulWidget`
+- [ ] Ajouter `_selectedPlayerId` + logique de filtrage
+- [ ] Construire la barre de filtres horizontale (Tous + joueurs)
+- [ ] Résoudre les noms de joueurs depuis `state.game.teamPlayers` (fallback `#numéro`)
+- [ ] Mettre à jour markers et résumé selon la sélection
+- [ ] Tester cas : aucun tir, un seul joueur, plusieurs joueurs
 
 ---
 
