@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sample_sport_stats/AppColors.dart';
 import 'package:sample_sport_stats/AppFontStyle.dart';
+import 'package:sample_sport_stats/infrastructure/DAO/player_dao.dart';
 import 'package:sample_sport_stats/infrastructure/DAO/shot_position_dao.dart';
+import 'package:sample_sport_stats/infrastructure/Entities/player_entity.dart';
 import 'package:sample_sport_stats/infrastructure/Entities/shot_position_entity.dart';
 import 'package:sample_sport_stats/models/ActionGame.dart';
 import 'package:sample_sport_stats/pages/history/widgets/CourtShotsVisualization.dart';
@@ -19,28 +21,26 @@ class ShootsHistoryPage extends StatefulWidget {
 
 class _ShootsHistoryPageState extends State<ShootsHistoryPage> {
   int? _selectedPlayerId;
-  late final Future<List<ShotPositionEntity>> _shotsFuture;
+  late final Future<List<dynamic>> _future;
 
   @override
   void initState() {
     super.initState();
-    _shotsFuture = ShotPositionDAO().getShotPositionsByGameId(widget.state.game.id!);
+    _future = Future.wait([
+      ShotPositionDAO().getShotPositionsByGameId(widget.state.game.id!),
+      PlayerDAO().getPlayersByTeamId(widget.state.game.team.id!),
+    ]);
   }
 
-  String _playerName(int playerId) {
-    final players = widget.state.game.teamPlayers;
-    try {
-      final player = players.firstWhere((p) => p.number == playerId);
-      return player.name;
-    } catch (_) {
-      return '#$playerId';
-    }
+  String _playerLabel(int playerId, Map<int, String> playerNames) {
+    final name = playerNames[playerId];
+    return name != null ? '$name  #$playerId' : '#$playerId';
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ShotPositionEntity>>(
-      future: _shotsFuture,
+    return FutureBuilder<List<dynamic>>(
+      future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -59,7 +59,11 @@ class _ShootsHistoryPageState extends State<ShootsHistoryPage> {
           );
         }
 
-        final shots = snapshot.data ?? [];
+        final shots = snapshot.data![0] as List<ShotPositionEntity>;
+        final players = snapshot.data![1] as List<PlayerEntity>;
+        final playerNames = <int, String>{
+          for (final p in players) p.number: p.name,
+        };
 
         if (shots.isEmpty) {
           return Center(
@@ -90,8 +94,9 @@ class _ShootsHistoryPageState extends State<ShootsHistoryPage> {
               _PlayerFilterBar(
                 playerIds: playerIds,
                 selectedPlayerId: _selectedPlayerId,
-                getPlayerName: _playerName,
-                onPlayerSelected: (id) => setState(() => _selectedPlayerId = id),
+                getPlayerLabel: (id) => _playerLabel(id, playerNames),
+                onPlayerSelected: (id) =>
+                    setState(() => _selectedPlayerId = id),
               ),
               const SizedBox(height: 8),
               Expanded(
@@ -128,13 +133,13 @@ class _ShootsHistoryPageState extends State<ShootsHistoryPage> {
 class _PlayerFilterBar extends StatelessWidget {
   final List<int> playerIds;
   final int? selectedPlayerId;
-  final String Function(int) getPlayerName;
+  final String Function(int) getPlayerLabel;
   final void Function(int?) onPlayerSelected;
 
   const _PlayerFilterBar({
     required this.playerIds,
     required this.selectedPlayerId,
-    required this.getPlayerName,
+    required this.getPlayerLabel,
     required this.onPlayerSelected,
   });
 
@@ -154,7 +159,7 @@ class _PlayerFilterBar extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 8),
               child: _FilterChip(
-                label: getPlayerName(playerId),
+                label: getPlayerLabel(playerId),
                 selected: selectedPlayerId == playerId,
                 onTap: () => onPlayerSelected(playerId),
               ),
@@ -181,7 +186,7 @@ class _FilterChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
           color: selected ? AppColors.blue : Colors.transparent,
           borderRadius: BorderRadius.circular(20),

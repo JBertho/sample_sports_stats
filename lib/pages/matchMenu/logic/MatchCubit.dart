@@ -1,55 +1,84 @@
 import 'package:bloc/bloc.dart';
+import 'package:sample_sport_stats/infrastructure/DAO/player_dao.dart';
+import 'package:sample_sport_stats/infrastructure/Entities/player_entity.dart';
+import 'package:sample_sport_stats/models/Player.dart';
 import 'package:sample_sport_stats/models/Team.dart';
 import 'package:sample_sport_stats/pages/matchMenu/logic/MatchState.dart';
 
-import '../../../models/Player.dart';
-
 class MatchCubit extends Cubit<MatchState> {
-  MatchCubit(): super(MatchStateInitial(team: Team(name: "", division: "", season: ""), teamPlayers: List.empty(), atHome: true));
+  MatchCubit()
+      : super(MatchStateInitial(
+            team: Team(name: '', division: '', season: ''),
+            teamPlayers: [],
+            atHome: true));
 
+  void initGame(Team team) async {
+    final entities = await PlayerDAO().getPlayersByTeamId(team.id!);
+    final players = entities
+        .map((e) => Player(id: e.id, name: e.name, number: e.number))
+        .toList();
+    emit(MatchStateInProgress(team: team, teamPlayers: players, atHome: true));
+  }
 
-  final List<Player> teamPlayers = [
-    Player(name: "Jamso", number: 1),
-    Player(name: "Carlito", number: 14),
-    Player(name: "Jean", number: 5),
-    Player(name: "Paul", number: 231),
-    Player(name: "Claude", number: 4),
-    Player(name: "Jimmy", number: 2),
-    Player(name: "Ali", number: 8),
-    Player(name: "Max", number: 12),
-    Player(name: "Guillaume", number: 23),
-    Player(name: "Charles", number: 18),
-  ];
-
-  void initGame(Team team) {
-    emit(MatchStateInProgress(team: team, teamPlayers: teamPlayers, atHome: true));
+  Future<void> addPlayer(String name, int number) async {
+    final entity = PlayerEntity(
+      name: name,
+      number: number,
+      teamId: state.team.id!,
+    );
+    final id = await PlayerDAO().insertPlayer(entity);
+    final newPlayer = Player(id: id, name: name, number: number);
+    final updated = List<Player>.from(state.teamPlayers)..add(newPlayer);
+    emit(MatchStateInProgress(
+        team: state.team, teamPlayers: updated, atHome: state.atHome));
   }
 
   void selectPlayer(Player player) {
-    bool contains = teamPlayers.contains(player);
+    final selectedCount = state.teamPlayers.where((p) => p.selected).length;
+    if (selectedCount >= 5) return;
 
-    if(contains) {
-      teamPlayers.firstWhere((pl) => pl.name == player.name && pl.number == player.number).selected = true;
-      emit(MatchStateInProgress(team: state.team, teamPlayers: teamPlayers, atHome: state.atHome));
+    final players = state.teamPlayers;
+    try {
+      players
+          .firstWhere((pl) => pl.number == player.number)
+          .selected = true;
+    } catch (_) {
+      return;
     }
+    emit(MatchStateInProgress(
+        team: state.team, teamPlayers: players, atHome: state.atHome));
   }
 
   void unselectPlayer(Player player) {
-    bool contains = teamPlayers.contains(player);
-    if(contains) {
-      teamPlayers.firstWhere((pl) => pl.name == player.name && pl.number == player.number).selected = false;
-    }
-    emit(MatchStateInProgress(team: state.team, teamPlayers: teamPlayers, atHome: state.atHome));
+    final players = state.teamPlayers;
+    try {
+      players
+          .firstWhere((pl) => pl.number == player.number)
+          .selected = false;
+    } catch (_) {}
+    emit(MatchStateInProgress(
+        team: state.team, teamPlayers: players, atHome: state.atHome));
   }
 
   void updateAtHome() {
-    emit(MatchStateInProgress(team: state.team, teamPlayers: state.teamPlayers, atHome: !state.atHome));
-
+    emit(MatchStateInProgress(
+        team: state.team,
+        teamPlayers: state.teamPlayers,
+        atHome: !state.atHome));
   }
 
   void beginMatch(String opponentName) {
-    var selectedList = state.teamPlayers.where((player) => player.selected).toList();
-    emit(BeginMatchState(team: state.team, teamPlayers: state.teamPlayers, atHome: state.atHome, opponentName: opponentName, selectedPlayers: selectedList));
-    emit(MatchStateInProgress(team: state.team, teamPlayers: state.teamPlayers, atHome: state.atHome));
+    final selectedList =
+        state.teamPlayers.where((player) => player.selected).toList();
+    emit(BeginMatchState(
+        team: state.team,
+        teamPlayers: state.teamPlayers,
+        atHome: state.atHome,
+        opponentName: opponentName,
+        selectedPlayers: selectedList));
+    emit(MatchStateInProgress(
+        team: state.team,
+        teamPlayers: state.teamPlayers,
+        atHome: state.atHome));
   }
 }

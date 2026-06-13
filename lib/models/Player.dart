@@ -1,7 +1,8 @@
 class Player {
+  final int? id;
   final String name;
   final int number;
   bool selected;
 
-  Player({required this.name, required this.number, this.selected = false});
+  Player({this.id, required this.name, required this.number, this.selected = false});
 }

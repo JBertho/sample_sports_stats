@@ -20,7 +20,7 @@ class SqliteHelper {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: (db, version) async {
         // Create tables and define schema
         await db.execute('''
@@ -78,6 +78,7 @@ class SqliteHelper {
       )
         ''');
         await db.execute(_shotPositionsSchema);
+        await db.execute(_playerSchema);
       },
       onUpgrade: (db, previous, after) async {
         if (previous < 2) {
@@ -121,9 +122,21 @@ class SqliteHelper {
         if (previous < 3) {
           await db.execute(_shotPositionsSchema);
         }
+        if (previous < 4) {
+          await db.execute(_playerSchema);
+        }
       }
     );
   }
+
+  static const String _playerSchema = '''
+    CREATE TABLE IF NOT EXISTS player (
+      id      INTEGER PRIMARY KEY AUTOINCREMENT,
+      name    TEXT    NOT NULL,
+      number  INTEGER NOT NULL,
+      team_id INTEGER NOT NULL
+    )
+  ''';
 
   static const String _shotPositionsSchema = '''
     CREATE TABLE IF NOT EXISTS shot_positions (

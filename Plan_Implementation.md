@@ -782,6 +782,55 @@ Optionnellement, l'espace libéré peut accueillir d'autres informations du matc
 
 ---
 
+## Étape 6 : Résolution des Noms de Joueurs dans Stats et Tirs
+
+### Objectif
+Dans les onglets "Stats" et "Tirs" de l'historique, afficher le **vrai nom** et le **numéro de maillot** des joueurs au lieu du fallback générique `Joueur #X`. Les données sont chargées depuis la table `player` (créée à l'Étape 5) en parallèle avec les statistiques ou les positions de tirs.
+
+### Problème résolu
+`Game.fromEntity()` reconstruit un `Game` avec `teamPlayers: List.empty()` — les noms ne sont donc jamais disponibles depuis l'état. La seule source fiable est la table `player` (jointure via `team_id`).
+
+---
+
+### 6.1 StatsHistoryPage — Chargement parallèle stats + joueurs
+
+**Fichier modifié :** `lib/pages/history/widgets/StatsHistoryPage.dart`
+
+**Changements :**
+- Converti en `StatefulWidget` pour stocker le `Future` dans `initState` (évite re-query à chaque rebuild)
+- `_future` combine `PlayerStatsDAO.getPlayerStatsByGameId` et `PlayerDAO.getPlayersByTeamId` via `Future.wait`
+- Construction d'une `Map<int, String>` `(numéro maillot → nom)` depuis les `PlayerEntity` chargés
+- `_buildCard()` résout le nom via la map ; fallback `'Joueur #X'` si joueur inconnu
+
+**Résultat :**
+- `PlayerStatsCard` affiche le vrai nom du joueur en header
+- Le numéro de maillot `#N` (déjà présent dans la card) reste correct
+
+---
+
+### 6.2 ShootsHistoryPage — Chargement parallèle tirs + joueurs
+
+**Fichier modifié :** `lib/pages/history/widgets/ShootsHistoryPage.dart`
+
+**Changements :**
+- `_future` remplace `_shotsFuture` : combine `ShotPositionDAO.getShotPositionsByGameId` et `PlayerDAO.getPlayersByTeamId` via `Future.wait`
+- `Map<int, String>` construite depuis les `PlayerEntity` chargés
+- `_playerLabel(playerId, playerNames)` retourne `'Nom  #N'` si nom connu, sinon `'#N'`
+- `_PlayerFilterBar` reçoit `getPlayerLabel` au lieu de `getPlayerName`
+- Les chips du filtre affichent donc `'Jamso  #1'`, `'Carlito  #14'`, etc.
+
+---
+
+### Checklist Étape 6
+- [x] Convertir `StatsHistoryPage` en `StatefulWidget`
+- [x] Charger `PlayerDAO.getPlayersByTeamId` en parallèle dans `StatsHistoryPage`
+- [x] Résoudre noms dans `_buildCard` via `Map<int, String>`
+- [x] Remplacer `_shotsFuture` par `_future` combiné dans `ShootsHistoryPage`
+- [x] Charger `PlayerDAO.getPlayersByTeamId` en parallèle dans `ShootsHistoryPage`
+- [x] Afficher `'Nom  #N'` dans les chips du filtre joueur
+
+---
+
 ## Ordre d'Exécution Recommandé
 
 ### Phase 1 : Foundation (Étape 1)
@@ -826,7 +875,13 @@ Optionnellement, l'espace libéré peut accueillir d'autres informations du matc
 - Supprimer la liste adversaire inutilisée dans `OpponentGameConfiguration`
 - **Validation :** Joueurs créés, persistés, rechargés entre sessions ; max 5 respecté
 
-**Durée totale estimée :** 13-19 heures
+### Phase 7 : Noms et Numéros de Maillot dans Stats et Tirs (Étape 6)
+**Durée estimée :** 1 heure
+- Charger les joueurs depuis `PlayerDAO` en parallèle dans `StatsHistoryPage` et `ShootsHistoryPage`
+- Afficher le vrai nom + `#N` dans les cartes stats et les chips de filtre
+- **Validation :** Plus de `Joueur #X` — noms réels partout dans l'historique
+
+**Durée totale estimée :** 14-20 heures
 
 ---
 
