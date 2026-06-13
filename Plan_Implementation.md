@@ -553,6 +553,235 @@ Améliorer l'onglet "Tirs" de la page Historique en ajoutant un en-tête avec la
 
 ---
 
+## Étape 5 : Gestion Dynamique des Joueurs
+
+### Objectif
+Remplacer la liste de joueurs codée en dur dans `MatchCubit` par une vraie gestion persistée en base de données, liée à chaque équipe. L'utilisateur peut créer ses joueurs depuis l'interface de configuration du match, les sauvegarder, et les retrouver à chaque nouveau match. La sélection au démarrage d'un match est limitée à **5 joueurs maximum**. En parallèle, le panneau "adversaire" est nettoyé de sa liste inutilisée.
+
+---
+
+### 5.1 Migration BDD — Table `player` (v3 → v4)
+
+**Fichier à modifier :** `lib/infrastructure/SqliteHelper.dart`
+
+**Schéma à ajouter :**
+```sql
+CREATE TABLE IF NOT EXISTS player (
+  id   INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT    NOT NULL,
+  number INTEGER NOT NULL,
+  team_id INTEGER NOT NULL
+)
+```
+
+**Changements dans `SqliteHelper` :**
+- Incrémenter `version: 3` → `version: 4`
+- Ajouter le schéma comme constante `_playerSchema`
+- Dans `onCreate` : ajouter `await db.execute(_playerSchema);`
+- Dans `onUpgrade` : ajouter `if (previous < 4) { await db.execute(_playerSchema); }`
+
+**Note :** La colonne `player_id` dans `player_stats` et `shot_positions` référence actuellement le numéro de maillot (`MatchPlayer.number`). Après cette migration, `player_id` devra référencer l'`id` BDD du joueur pour une cohérence relationnelle correcte. Adapter en conséquence dans `CurrentGameCubit.finishGame()`.
+
+---
+
+### 5.2 Infrastructure — PlayerEntity et PlayerDAO
+
+**Fichier à créer :** `lib/infrastructure/Entities/player_entity.dart`
+```dart
+class PlayerEntity {
+  int? id;
+  String name;
+  int number;
+  int teamId;
+
+  PlayerEntity({this.id, required this.name, required this.number, required this.teamId});
+
+  Map<String, Object?> toMap() => {
+    'id': id,
+    'name': name,
+    'number': number,
+    'team_id': teamId,
+  };
+
+  static PlayerEntity fromMap(Map<String, dynamic> map) => PlayerEntity(
+    id: map['id'],
+    name: map['name'],
+    number: map['number'],
+    teamId: map['team_id'],
+  );
+}
+```
+
+**Fichier à créer :** `lib/infrastructure/DAO/player_dao.dart`
+```dart
+class PlayerDAO {
+  Future<int> insertPlayer(PlayerEntity entity) async { ... }
+  Future<List<PlayerEntity>> getPlayersByTeamId(int teamId) async { ... }
+  Future<void> deletePlayer(int id) async { ... }
+}
+```
+
+---
+
+### 5.3 Modèle Player — Ajout du champ `id`
+
+**Fichier à modifier :** `lib/models/Player.dart`
+
+```dart
+class Player {
+  final int? id;      // NOUVEAU : id BDD (null si pas encore persisté)
+  final String name;
+  final int number;
+  bool selected;
+
+  Player({this.id, required this.name, required this.number, this.selected = false});
+}
+```
+
+---
+
+### 5.4 MatchCubit — Chargement depuis BDD + Ajout joueur + Limite 5
+
+**Fichier à modifier :** `lib/pages/matchMenu/logic/MatchCubit.dart`
+
+**Suppressions :**
+- Retirer la liste `teamPlayers` codée en dur (10 joueurs hardcodés)
+
+**Modifications de `initGame(Team team)` :**
+```dart
+void initGame(Team team) async {
+  final entities = await PlayerDAO().getPlayersByTeamId(team.id!);
+  final players = entities.map((e) => Player(id: e.id, name: e.name, number: e.number)).toList();
+  emit(MatchStateInProgress(team: team, teamPlayers: players, atHome: true));
+}
+```
+→ La méthode devient `async` ; état initial vide tant que le `Future` n'est pas résolu.
+
+**Nouvelle méthode `addPlayer(String name, int number)` :**
+```dart
+Future<void> addPlayer(String name, int number) async {
+  final entity = PlayerEntity(name: name, number: number, teamId: state.team.id!);
+  final id = await PlayerDAO().insertPlayer(entity);
+  final newPlayer = Player(id: id, name: name, number: number);
+  final updated = List<Player>.from(state.teamPlayers)..add(newPlayer);
+  emit(MatchStateInProgress(team: state.team, teamPlayers: updated, atHome: state.atHome));
+}
+```
+
+**Modification de `selectPlayer` — limite 5 :**
+```dart
+void selectPlayer(Player player) {
+  final selectedCount = state.teamPlayers.where((p) => p.selected).length;
+  if (selectedCount >= 5) return;  // Bloquer si déjà 5 sélectionnés
+  // ... logique existante
+}
+```
+
+**Getter utilitaire dans le state (ou cubit) :**
+```dart
+bool get isMaxPlayersReached =>
+    state.teamPlayers.where((p) => p.selected).length >= 5;
+```
+
+---
+
+### 5.5 MatchPage — UI Ajout Joueur + Compteur sélection
+
+**Fichier à modifier :** `lib/pages/matchMenu/MatchPage.dart` — classe `RightSideWidget`
+
+**Ajouts :**
+
+1. **Compteur de sélection** en haut de la liste :
+```dart
+Text(
+  '${selectedCount}/5 joueurs sélectionnés',
+  style: TextStyle(
+    color: selectedCount == 5 ? AppColors.orange : AppColors.blue,
+    fontWeight: FontWeight.bold,
+  ),
+)
+```
+
+2. **Bouton "Ajouter un joueur"** en bas de la grille (visible seulement si nombre total de joueurs < limite raisonnable, ex: 15) :
+```dart
+AddPlayerWidget(
+  onAdd: (name, number) => context.read<MatchCubit>().addPlayer(name, number),
+)
+```
+
+3. **Grisage des joueurs non-sélectionnés** quand 5 sont déjà sélectionnés :
+- Dans `PlayerSelectionWidget` : ajouter param `bool disabled`
+- Si `disabled`, rendre le bouton semi-transparent et `onTap: null`
+
+**Dialog de création joueur** (inline dans `MatchPage.dart` ou fichier séparé `AddPlayerDialog.dart`) :
+```dart
+class AddPlayerDialog extends StatelessWidget {
+  final Function(String name, int number) onConfirm;
+  // Deux champs : Nom + Numéro de maillot
+  // Validation : nom non-vide, numéro entre 0 et 99
+}
+```
+
+**Structure finale de `RightSideWidget` :**
+```
+Column:
+  - Text "Choix de mes joueurs :"
+  - Text "X/5 sélectionnés"  ← NOUVEAU
+  - GridView (joueurs existants, avec grisage si max atteint)
+  - Bouton "+ Ajouter un joueur"  ← NOUVEAU
+```
+
+---
+
+### 5.6 Suppression de la liste "Joueurs adverses"
+
+**Fichier à modifier :** `lib/pages/matchMenu/MatchPage.dart` — classe `OpponentGameConfiguration`
+
+**Suppression :** Retirer le `ListView.builder` (lignes ~331-357) qui génère 10 lignes "Joueur adverse X" avec des containers vides. Cette liste n'est jamais utilisée et prend de la place inutilement.
+
+**Résultat :** Le panneau gauche n'affiche plus que :
+- Champ "Nom de l'équipe adverse"
+- Boutons Domicile / Extérieur
+
+Optionnellement, l'espace libéré peut accueillir d'autres informations du match (date, lieu, arbitre…) si besoin dans le futur.
+
+---
+
+### Vérification
+
+**Tests manuels :**
+1. Créer une équipe → aller dans le menu match → vérifier que la liste de joueurs est vide (plus de joueurs en dur)
+2. Ajouter 3 joueurs via le bouton → vérifier qu'ils apparaissent dans la grille
+3. Fermer et rouvrir le match pour la même équipe → vérifier que les joueurs persistent (rechargés depuis BDD)
+4. Sélectionner 5 joueurs → vérifier que le 6ème joueur ne peut pas être sélectionné (bouton grisé)
+5. Désélectionner un joueur → vérifier que la sélection est de nouveau possible
+6. Vérifier que le panneau adversaire n'affiche plus la liste inutile
+7. Démarrer un match → vérifier que les 5 joueurs sélectionnés sont bien en `teamPlayers` dans `CurrentGame`
+
+**Cas limites :**
+- Équipe sans joueur : message "Aucun joueur, ajoutez-en un"
+- Numéro de maillot déjà utilisé dans l'équipe : avertissement ou blocage
+- Équipe avec 1 seul joueur : bouton "GO !" doit-il être bloqué ? (À décider : avertissement ou libre)
+
+---
+
+### Checklist Étape 5
+- [ ] Incrémenter DB version 3 → 4 dans `SqliteHelper`
+- [ ] Ajouter constante `_playerSchema` et l'appeler dans `onCreate` et `onUpgrade`
+- [ ] Créer `PlayerEntity.dart`
+- [ ] Créer `PlayerDAO.dart` (insert, getByTeamId, delete)
+- [ ] Ajouter champ `id` dans `Player.dart`
+- [ ] Modifier `MatchCubit.initGame()` → async, charge depuis BDD
+- [ ] Ajouter `MatchCubit.addPlayer()`
+- [ ] Ajouter limite max 5 dans `MatchCubit.selectPlayer()`
+- [ ] Modifier `RightSideWidget` : compteur + bouton ajout + grisage
+- [ ] Créer `AddPlayerDialog` (nom + numéro)
+- [ ] Supprimer liste adversaire dans `OpponentGameConfiguration`
+- [ ] Tester migration BDD sur install existante
+- [ ] Tester persistence des joueurs entre sessions
+
+---
+
 ## Ordre d'Exécution Recommandé
 
 ### Phase 1 : Foundation (Étape 1)
@@ -587,7 +816,17 @@ Améliorer l'onglet "Tirs" de la page Historique en ajoutant un en-tête avec la
 - Filtrer markers et résumé selon sélection
 - **Validation :** Chaque joueur est isolable depuis le header, "Tous" rétablit la vue complète
 
-**Durée totale estimée :** 10-15 heures
+### Phase 6 : Gestion Dynamique des Joueurs (Étape 5)
+**Durée estimée :** 3-4 heures
+- Migration BDD v3 → v4 (table `player`)
+- Créer `PlayerEntity` et `PlayerDAO`
+- Charger les joueurs depuis la BDD dans `MatchCubit` (fin des joueurs en dur)
+- Ajouter la création de joueur depuis l'interface (dialog nom + numéro)
+- Limiter la sélection à 5 joueurs max avec feedback visuel
+- Supprimer la liste adversaire inutilisée dans `OpponentGameConfiguration`
+- **Validation :** Joueurs créés, persistés, rechargés entre sessions ; max 5 respecté
+
+**Durée totale estimée :** 13-19 heures
 
 ---
 
@@ -773,6 +1012,21 @@ Si beaucoup de matchs avec beaucoup de tirs :
 - [ ] Résoudre les noms de joueurs depuis `state.game.teamPlayers` (fallback `#numéro`)
 - [ ] Mettre à jour markers et résumé selon la sélection
 - [ ] Tester cas : aucun tir, un seul joueur, plusieurs joueurs
+
+### Étape 5 : Gestion Dynamique des Joueurs
+- [ ] Incrémenter version BDD 3 → 4 dans `SqliteHelper.dart`
+- [ ] Ajouter `_playerSchema` dans `SqliteHelper` (`onCreate` + `onUpgrade`)
+- [ ] Créer `lib/infrastructure/Entities/player_entity.dart`
+- [ ] Créer `lib/infrastructure/DAO/player_dao.dart` (insert, getByTeamId, delete)
+- [ ] Ajouter champ `id` dans `lib/models/Player.dart`
+- [ ] Modifier `MatchCubit.initGame()` : async, chargement depuis `PlayerDAO`
+- [ ] Ajouter `MatchCubit.addPlayer(String name, int number)` avec persistance
+- [ ] Bloquer sélection dans `MatchCubit.selectPlayer()` si déjà 5 sélectionnés
+- [ ] Modifier `RightSideWidget` : compteur "X/5", bouton "+ Ajouter", grisage si max
+- [ ] Créer dialog `AddPlayerDialog` (champs nom + numéro, validation)
+- [ ] Supprimer `ListView.builder` des joueurs adverses dans `OpponentGameConfiguration`
+- [ ] Tester migration sur BDD existante (v3 → v4)
+- [ ] Tester persistence des joueurs entre sessions
 
 ---
 
