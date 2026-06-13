@@ -307,7 +307,10 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
     }
 
     for (MatchPlayer matchPlayer in state.teamPlayers) {
-      playerStatsDao.insertPlayerStats(PlayerStatsEntity.fromModel(matchPlayer.playerStats, playerId: matchPlayer.number, gameId: insertGameId));
+      playerStatsDao.insertPlayerStats(PlayerStatsEntity.fromModel(
+          matchPlayer.playerStats,
+          playerId: matchPlayer.number,
+          gameId: insertGameId));
     }
 
     for (History history in state.histories) {
@@ -322,6 +325,18 @@ class CurrentGameCubit extends Cubit<CurrentGameState> {
         elapsedTimeMs: history.elapsedTime.inMilliseconds,
       ));
     }
+
+    emit(CurrentGameFinished(
+      team: state.team,
+      opponentScore: state.opponentScore,
+      opponent: state.opponent,
+      histories: state.histories,
+      teamPlayers: state.teamPlayers,
+      substitutes: state.substitutes,
+      atHome: state.atHome,
+      teamScore: state.teamScore,
+      quarters: state.quarters,
+    ));
   }
 
   void saveQuarter(int quarterNumber, Duration duration) {

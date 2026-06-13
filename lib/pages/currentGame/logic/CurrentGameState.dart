@@ -79,3 +79,16 @@ class CurrentGameAskToFinish extends CurrentGameInProgress {
       required super.team,
       required super.quarters});
 }
+
+class CurrentGameFinished extends CurrentGameState {
+  CurrentGameFinished(
+      {required super.teamScore,
+      required super.opponentScore,
+      required super.histories,
+      required super.opponent,
+      required super.teamPlayers,
+      required super.substitutes,
+      required super.atHome,
+      required super.team,
+      required super.quarters});
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sample_sport_stats/AppColors.dart';
 import 'package:sample_sport_stats/models/MatchPlayer.dart';
@@ -59,6 +60,9 @@ class _CurrentMatchPage extends StatelessWidget {
                     listener: (listenerContext, state) {
               if (state is CurrentGameAskToFinish) {
                 showAlertDialog(listenerContext);
+              }
+              if (state is CurrentGameFinished) {
+                listenerContext.pop();
               }
             }, child: BlocBuilder<CurrentGameCubit, CurrentGameState>(
                         builder: (context, state) {
