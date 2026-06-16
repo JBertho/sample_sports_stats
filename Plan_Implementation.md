@@ -831,6 +831,190 @@ Dans les onglets "Stats" et "Tirs" de l'historique, afficher le **vrai nom** et 
 
 ---
 
+## Étape 7 : Refonte de l'Onglet Stats — Tableau Joueurs + Cards Résumé Match
+
+### Objectif
+Remplacer les `PlayerStatsCard` individuelles dans `StatsHistoryPage` par :
+1. **Une ligne de 5 cards "Match"** en haut de l'écran, regroupant les stats agrégées de toute l'équipe (Points, Rebonds, Interceptions, Contres, Éval)
+2. **Un tableau unique "Joueurs"** en dessous, listant toutes les stats détaillées de chaque joueur en lignes/colonnes
+
+### Besoin utilisateur
+- Vue synthétique rapide du match via les 5 cards
+- Vue comparative des joueurs via le tableau (toutes les stats côte à côte)
+- Plus lisible et dense en information qu'un empilement de cards individuelles
+
+---
+
+### Fichiers à Modifier/Créer
+
+**À Modifier :**
+- `lib/pages/history/widgets/StatsHistoryPage.dart`
+  - Remplacer `ListView` de `PlayerStatsCard` par la nouvelle structure (cards Match + tableau Joueurs)
+
+**À Créer :**
+- `lib/pages/history/widgets/MatchSummaryCards.dart`
+  - Ligne horizontale de 5 cards agrégées
+- `lib/pages/history/widgets/PlayersStatsTable.dart`
+  - Tableau avec une ligne par joueur et une colonne par stat
+
+**À Supprimer (ou garder en fallback) :**
+- `lib/pages/history/widgets/PlayerStatsCard.dart` — remplacé par le tableau
+
+---
+
+### Implémentation Détaillée
+
+#### 7.1 Structure générale de `StatsHistoryPage`
+
+```dart
+Column(
+  children: [
+    // Titre section
+    Text("Match", style: AppFontStyle.sectionTitle),
+    SizedBox(height: 8),
+
+    // 5 cards agrégées
+    MatchSummaryCards(stats: allPlayerStats),
+
+    SizedBox(height: 16),
+
+    // Titre section
+    Text("Joueurs", style: AppFontStyle.sectionTitle),
+    SizedBox(height: 8),
+
+    // Tableau joueurs (scrollable verticalement si nécessaire)
+    Expanded(
+      child: PlayersStatsTable(
+        stats: allPlayerStats,
+        playerNames: playerNames, // Map<int, String> numéro → nom
+      ),
+    ),
+  ],
+)
+```
+
+#### 7.2 Créer `MatchSummaryCards`
+
+Ligne de 5 `Card` occupant chacune 1/5 de la largeur disponible. Les valeurs sont la somme de tous les joueurs.
+
+**Stats affichées :**
+| Card | Calcul |
+|------|--------|
+| Points | `(twoPointMade * 2) + (threePointMade * 3) + freeThrowMade` pour tous les joueurs |
+| Rebonds | `offensiveRebound + defensiveRebound` pour tous les joueurs |
+| Interceptions | `steals` pour tous les joueurs |
+| Contres | `blocks` pour tous les joueurs |
+| Éval | `Points + Rebonds + Interceptions + Contres − (tirs ratés) − turnovers` pour tous les joueurs |
+
+**Structure d'une card :**
+```dart
+Card(
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(label, style: AppFontStyle.statLabel),   // ex: "Points"
+      SizedBox(height: 4),
+      Text('$value', style: AppFontStyle.statValue), // ex: "78"
+    ],
+  ),
+)
+```
+
+**Layout :**
+```dart
+Row(
+  children: summaryStats.map((s) =>
+    Expanded(child: MatchSummaryCard(label: s.label, value: s.value))
+  ).toList(),
+)
+```
+
+#### 7.3 Créer `PlayersStatsTable`
+
+Tableau `DataTable` (ou implémentation custom si `DataTable` est trop verbeux en paysage) avec :
+
+**Colonnes (dans cet ordre) :**
+| Colonne | Source |
+|---------|--------|
+| `#` | Numéro de maillot |
+| Joueur | Nom (depuis `playerNames`) |
+| Pts | `(twoPointMade * 2) + (threePointMade * 3) + freeThrowMade` |
+| 2pts | `twoPointMade / (twoPointMade + twoPointMissed)` en `X/Y` |
+| 3pts | `threePointMade / (threePointMade + threePointMissed)` en `X/Y` |
+| LF | `freeThrowMade / (freeThrowMade + freeThrowMissed)` en `X/Y` |
+| Reb | `offensiveRebound + defensiveRebound` |
+| Int | `steals` |
+| Ctrs | `blocks` |
+| Bpe | `turnovers` |
+| Ftes | `fouls` |
+| Éval | `Pts + Reb + Int + Ctrs − tirs_ratés − Bpe` |
+
+**Tri :**
+- Par défaut : ordre alphabétique par nom ou par numéro croissant
+- Optionnel : tap sur en-tête de colonne pour trier par cette stat
+
+**Design :**
+```dart
+SingleChildScrollView(
+  scrollDirection: Axis.horizontal,
+  child: DataTable(
+    headingRowColor: MaterialStatePropertyAll(AppColors.blue),
+    columns: [...],
+    rows: stats.map((s) => DataRow(cells: [...])).toList(),
+  ),
+)
+```
+
+- En-têtes : fond `AppColors.blue`, texte blanc, bold
+- Lignes alternées : fond légèrement grisé pour lisibilité (`Colors.grey.shade100`)
+- Colonnes numériques : alignées à droite
+- Colonne joueur : alignée à gauche
+- Éval surlignée si positive (vert clair) ou négative (rouge clair)
+
+---
+
+### Calcul de l'Évaluation (Éval)
+
+Formule standard basketball :
+```
+Éval = Points + Rebonds + Interceptions + Contres
+       − Tirs_2pts_ratés − Tirs_3pts_ratés − LF_ratés − Turnovers
+```
+
+```dart
+int computeEval(PlayerStatsEntity s) {
+  final points = (s.twoPointMade * 2) + (s.threePointMade * 3) + s.freeThrowMade;
+  final rebounds = s.offensiveRebound + s.defensiveRebound;
+  final missed = s.twoPointMissed + s.threePointMissed + s.freeThrowMissed;
+  return points + rebounds + s.steals + s.blocks - missed - s.turnovers;
+}
+```
+
+---
+
+### Considérations UX
+
+1. **Mode paysage** — La largeur disponible est plus grande qu'en portrait, ce qui rend le tableau horizontal naturel. `SingleChildScrollView(Axis.horizontal)` seulement si les colonnes dépassent l'écran sur petits appareils
+2. **Cards Match** — hauteur fixe (~80-90dp), largeur égale pour les 5 cards via `Expanded`
+3. **Lisibilité du tableau** — textes de taille 12-13sp, espacement compact mais suffisant
+4. **État vide** — si aucune stat n'est chargée, afficher `CircularProgressIndicator` puis message "Aucune statistique disponible"
+
+---
+
+### Vérification
+
+**Tests manuels :**
+1. Jouer un match avec 3+ joueurs et des stats variées
+2. Ouvrir l'historique → onglet Stats
+3. Vérifier que les 5 cards "Match" affichent bien les totaux agrégés
+4. Vérifier que le tableau "Joueurs" liste tous les joueurs avec leurs stats individuelles
+5. Vérifier le calcul de l'Éval (Points + Reb + Int + Ctrs − ratés − Bpe) manuellement sur un joueur
+6. Vérifier l'affichage sur différentes tailles d'écran (scroll horizontal si besoin)
+7. Vérifier qu'un match avec un seul joueur s'affiche correctement
+8. Vérifier qu'un match sans stats (0 partout) ne plante pas
+
+---
+
 ## Ordre d'Exécution Recommandé
 
 ### Phase 1 : Foundation (Étape 1)
@@ -881,7 +1065,14 @@ Dans les onglets "Stats" et "Tirs" de l'historique, afficher le **vrai nom** et 
 - Afficher le vrai nom + `#N` dans les cartes stats et les chips de filtre
 - **Validation :** Plus de `Joueur #X` — noms réels partout dans l'historique
 
-**Durée totale estimée :** 14-20 heures
+### Phase 8 : Refonte Onglet Stats — Tableau + Cards Match (Étape 7)
+**Durée estimée :** 2-3 heures
+- Créer `MatchSummaryCards` avec les 5 cards agrégées (Points, Rebonds, Interceptions, Contres, Éval)
+- Créer `PlayersStatsTable` (tableau `DataTable` une ligne par joueur)
+- Modifier `StatsHistoryPage` pour intégrer les deux nouveaux widgets sous les titres "Match" et "Joueurs"
+- **Validation :** Onglet Stats affiche les totaux équipe + le tableau comparatif des joueurs
+
+**Durée totale estimée :** 16-23 heures
 
 ---
 
@@ -1068,6 +1259,7 @@ Si beaucoup de matchs avec beaucoup de tirs :
 - [ ] Mettre à jour markers et résumé selon la sélection
 - [ ] Tester cas : aucun tir, un seul joueur, plusieurs joueurs
 
+
 ### Étape 5 : Gestion Dynamique des Joueurs
 - [ ] Incrémenter version BDD 3 → 4 dans `SqliteHelper.dart`
 - [ ] Ajouter `_playerSchema` dans `SqliteHelper` (`onCreate` + `onUpgrade`)
@@ -1082,6 +1274,16 @@ Si beaucoup de matchs avec beaucoup de tirs :
 - [ ] Supprimer `ListView.builder` des joueurs adverses dans `OpponentGameConfiguration`
 - [ ] Tester migration sur BDD existante (v3 → v4)
 - [ ] Tester persistence des joueurs entre sessions
+
+### Étape 7 : Refonte Onglet Stats — Tableau + Cards Match
+- [ ] Créer `MatchSummaryCards.dart` (5 cards Points / Rebonds / Interceptions / Contres / Éval)
+- [ ] Implémenter `computeEval()` pour le calcul de l'évaluation
+- [ ] Créer `PlayersStatsTable.dart` (DataTable une ligne par joueur, colonnes stat)
+- [ ] Modifier `StatsHistoryPage.dart` : intégrer titre "Match" + cards + titre "Joueurs" + tableau
+- [ ] Supprimer ou archiver `PlayerStatsCard.dart` (remplacé par le tableau)
+- [ ] Vérifier totaux des 5 cards = somme des lignes du tableau
+- [ ] Tester scroll horizontal du tableau sur petit écran
+- [ ] Vérifier affichage avec 0 stats, 1 joueur, N joueurs
 
 ---
 
